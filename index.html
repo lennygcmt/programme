@@ -111,6 +111,37 @@
   .wbn{font-size:16px;font-weight:700;}
   .wbp{font-size:9px;color:var(--muted);margin-top:2px;font-weight:500;}
   .wbtn.active .wbp{color:rgba(255,255,255,0.7);}
+
+  /* CHRONO MODAL */
+  .chrono-overlay{position:fixed;inset:0;background:rgba(0,0,0,0.85);z-index:200;display:flex;align-items:flex-end;justify-content:center;opacity:0;pointer-events:none;transition:opacity .25s;}
+  .chrono-overlay.open{opacity:1;pointer-events:all;}
+  .chrono-modal{background:var(--surface);border-radius:28px 28px 0 0;padding:28px 24px calc(28px + env(safe-area-inset-bottom));width:100%;max-width:500px;transform:translateY(40px);transition:transform .3s cubic-bezier(.4,0,.2,1);}
+  .chrono-overlay.open .chrono-modal{transform:translateY(0);}
+  .chrono-task-name{font-size:15px;font-weight:700;text-align:center;margin-bottom:4px;color:var(--text);}
+  .chrono-task-dur{font-size:12px;color:var(--muted);text-align:center;margin-bottom:24px;}
+
+  .chrono-ring-wrap{display:flex;justify-content:center;margin-bottom:24px;}
+  .chrono-svg{transform:rotate(-90deg);}
+  .chrono-bg{fill:none;stroke:rgba(255,255,255,0.06);stroke-width:10;}
+  .chrono-arc{fill:none;stroke:var(--accent);stroke-width:10;stroke-linecap:round;transition:stroke-dashoffset .5s linear, stroke .3s;}
+  .chrono-center{position:absolute;display:flex;flex-direction:column;align-items:center;justify-content:center;}
+  .chrono-ring-outer{position:relative;display:flex;align-items:center;justify-content:center;width:170px;height:170px;}
+  .chrono-time{font-family:'DM Mono',monospace;font-size:36px;font-weight:700;color:var(--text);line-height:1;}
+  .chrono-status{font-size:11px;color:var(--muted);margin-top:4px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;}
+
+  .chrono-btns{display:flex;gap:12px;}
+  .cbtn{flex:1;padding:16px;border-radius:16px;font-family:'DM Sans',sans-serif;font-size:15px;font-weight:700;border:none;cursor:pointer;transition:all .2s;}
+  .cbtn:active{transform:scale(.96);}
+  .cbtn-start{background:var(--accent);color:white;}
+  .cbtn-stop{background:rgba(239,68,68,0.15);border:1.5px solid rgba(239,68,68,0.3);color:#ef4444;}
+  .cbtn-close{background:var(--surface2);border:1.5px solid var(--border);color:var(--muted);}
+
+  .chrono-done-msg{text-align:center;padding:16px 0 8px;font-size:14px;color:var(--green);font-weight:700;display:none;}
+
+  /* Bouton chrono sur chaque tâche */
+  .t-chrono-btn{margin-top:10px;display:inline-flex;align-items:center;gap:6px;background:rgba(79,142,247,0.1);border:1px solid rgba(79,142,247,0.2);border-radius:10px;padding:6px 12px;font-size:12px;font-weight:600;color:var(--accent);cursor:pointer;transition:all .2s;}
+  .t-chrono-btn:active{transform:scale(.96);}
+  .task.done .t-chrono-btn{opacity:.3;pointer-events:none;}
 </style>
 </head>
 <body>
@@ -177,6 +208,32 @@
   <div class="bs"><div class="bn" id="totalN">—</div><div class="bl">Total</div></div>
   <div class="bs"><div class="bn" id="minLeft">—</div><div class="bl">min restantes</div></div>
   <button class="rbtn" onclick="resetDay()">Réinit.</button>
+</div>
+
+<!-- CHRONO MODAL -->
+<div class="chrono-overlay" id="chronoOverlay" onclick="closeChronoOut(event)">
+  <div class="chrono-modal">
+    <div class="chrono-task-name" id="cTaskName">Exercice</div>
+    <div class="chrono-task-dur" id="cTaskDur">5 min</div>
+    <div class="chrono-ring-wrap">
+      <div class="chrono-ring-outer">
+        <svg class="chrono-svg" width="170" height="170" id="chronoSvg">
+          <circle class="chrono-bg" cx="85" cy="85" r="74"/>
+          <circle class="chrono-arc" cx="85" cy="85" r="74" id="chronoArc"/>
+        </svg>
+        <div class="chrono-center">
+          <div class="chrono-time" id="cTime">00:00</div>
+          <div class="chrono-status" id="cStatus">Prêt</div>
+        </div>
+      </div>
+    </div>
+    <div class="chrono-done-msg" id="cDoneMsg">✅ Temps écoulé — bien joué !</div>
+    <div class="chrono-btns">
+      <button class="cbtn cbtn-start" id="cBtnStart" onclick="chronoStartStop()">▶ Démarrer</button>
+      <button class="cbtn cbtn-stop" id="cBtnReset" onclick="chronoReset()">↺ Reset</button>
+      <button class="cbtn cbtn-close" onclick="closeChronoModal()">✕</button>
+    </div>
+  </div>
 </div>
 
 <div class="overlay" id="wkOverlay" onclick="closeModalOut(event)">
@@ -670,6 +727,7 @@ function makeTask(task, done){
       </div>
       <div class="t-desc">${task.desc}</div>
       <div class="t-tags">${tags}</div>
+      <div class="t-chrono-btn" onclick="event.stopPropagation();openChrono('${task.title}', ${task.dur})">⏱ Lancer le chrono — ${task.dur} min</div>
     </div>`;
   el.onclick = () => toggle(el, task.id);
   return el;
@@ -765,6 +823,107 @@ function updateHeader(){
   const d=new Date();
   document.getElementById('dayLbl').textContent = days[d.getDay()];
   document.getElementById('dateLbl').textContent= `${d.getDate()} ${months[d.getMonth()]} ${d.getFullYear()}`;
+}
+
+// ═══════════════════════════════════════════════════════════════
+// CHRONO
+// ═══════════════════════════════════════════════════════════════
+const MAX_CHRONO_SEC = 30 * 60; // 30 min max absolu
+let cInterval = null;
+let cTotal    = 0;   // durée totale en secondes
+let cRemain   = 0;   // secondes restantes
+let cRunning  = false;
+
+const CIRCUM = 2 * Math.PI * 74; // circonférence cercle r=74
+
+function openChrono(name, durMin) {
+  const dur = Math.min(durMin * 60, MAX_CHRONO_SEC);
+  cTotal   = dur;
+  cRemain  = dur;
+  cRunning = false;
+  clearInterval(cInterval);
+
+  document.getElementById('cTaskName').textContent = name;
+  document.getElementById('cTaskDur').textContent  = durMin <= 30
+    ? `${durMin} min` : `${durMin} min (limité à 30 min)`;
+  document.getElementById('cBtnStart').textContent = '▶ Démarrer';
+  document.getElementById('cDoneMsg').style.display = 'none';
+  document.getElementById('cStatus').textContent   = 'Prêt';
+  document.getElementById('cStatus').style.color   = 'var(--muted)';
+
+  updateChronoDisplay();
+  document.getElementById('chronoOverlay').classList.add('open');
+}
+
+function closeChronoModal() {
+  clearInterval(cInterval);
+  cRunning = false;
+  document.getElementById('chronoOverlay').classList.remove('open');
+}
+
+function closeChronoOut(e) {
+  if (e.target === document.getElementById('chronoOverlay')) closeChronoModal();
+}
+
+function chronoStartStop() {
+  if (cRemain <= 0) return;
+  if (cRunning) {
+    clearInterval(cInterval);
+    cRunning = false;
+    document.getElementById('cBtnStart').textContent = '▶ Reprendre';
+    document.getElementById('cStatus').textContent   = 'En pause';
+  } else {
+    cRunning = true;
+    document.getElementById('cBtnStart').textContent = '⏸ Pause';
+    document.getElementById('cStatus').textContent   = 'En cours…';
+    document.getElementById('cStatus').style.color   = 'var(--green)';
+    cInterval = setInterval(() => {
+      cRemain--;
+      updateChronoDisplay();
+      if (cRemain <= 0) {
+        clearInterval(cInterval);
+        cRunning = false;
+        document.getElementById('cBtnStart').textContent    = '✓ Terminé';
+        document.getElementById('cStatus').textContent      = 'Fini !';
+        document.getElementById('cStatus').style.color      = 'var(--green)';
+        document.getElementById('cDoneMsg').style.display   = 'block';
+        document.getElementById('chronoArc').style.stroke   = 'var(--green)';
+        // vibration si dispo
+        if (navigator.vibrate) navigator.vibrate([300, 100, 300]);
+      }
+    }, 1000);
+  }
+}
+
+function chronoReset() {
+  clearInterval(cInterval);
+  cRunning = false;
+  cRemain  = cTotal;
+  document.getElementById('cBtnStart').textContent    = '▶ Démarrer';
+  document.getElementById('cDoneMsg').style.display   = 'none';
+  document.getElementById('cStatus').textContent      = 'Prêt';
+  document.getElementById('cStatus').style.color      = 'var(--muted)';
+  document.getElementById('chronoArc').style.stroke   = 'var(--accent)';
+  updateChronoDisplay();
+}
+
+function updateChronoDisplay() {
+  const m = Math.floor(cRemain / 60);
+  const s = cRemain % 60;
+  document.getElementById('cTime').textContent =
+    `${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')}`;
+
+  // arc SVG
+  const ratio   = cTotal > 0 ? cRemain / cTotal : 1;
+  const offset  = CIRCUM * (1 - ratio);
+  const arc = document.getElementById('chronoArc');
+  arc.style.strokeDasharray  = CIRCUM;
+  arc.style.strokeDashoffset = offset;
+
+  // couleur selon temps restant
+  if (ratio > 0.5)       arc.style.stroke = 'var(--accent)';
+  else if (ratio > 0.2)  arc.style.stroke = 'var(--orange, #f97316)';
+  else                   arc.style.stroke = '#ef4444';
 }
 
 // ═══════════════════════════════════════════════════════════════
