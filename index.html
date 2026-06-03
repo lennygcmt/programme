@@ -75,6 +75,9 @@
   .tag.t{background:rgba(79,142,247,0.15);color:#93c5fd;}
   .tag.s{background:rgba(34,197,94,0.15);color:#4ade80;}
   .tag.d{background:rgba(255,255,255,0.07);color:var(--muted);}
+  .tag.e{background:rgba(6,182,212,0.12);color:#67e8f9;}
+  .tag.a{background:rgba(251,191,36,0.12);color:#fcd34d;}
+  .tag.v{background:rgba(168,85,247,0.12);color:#c084fc;}
 
   /* ANIM */
   @keyframes bi{0%{transform:scale(1)}30%{transform:scale(.96)}60%{transform:scale(1.02)}100%{transform:scale(1)}}
@@ -250,396 +253,226 @@
 
 const PROGRAM = {
 
-  // ── SEMAINES 1-2 : FONDATION ────────────────────────────────
-  // Kegel : Kegel de base × 2/jour
-  // Technique : Stop & Start solo (5 min de plateau)
-  // Respiration : Cohérence cardiaque 3×/jour
-  // Durée : 20-25 min
   "1-2": {
-    phase: "FONDATION",
-    objectif: "Renforcement de base + conscience corporelle",
-    duree: "20–25 min / jour",
-    tasks: [
-      {
-        id:"cc_matin", slot:"bureau",
-        title:"Cohérence cardiaque — Matin",
-        desc:"Inspirer 5 sec par le nez → expirer 5 sec par la bouche. 5 min assis à ton bureau. 3× par jour obligatoire cette semaine.",
-        time:"10h30", tags:["b"], dur:5
-      },
-      {
-        id:"kegel_base_1", slot:"bureau",
-        title:"Kegel de base — Contraction lente (Série 1)",
-        desc:"Contracter le muscle PC comme pour retenir l'urine → tenir 10 sec → relâcher lentement 10 sec. 10 répétitions. Assis, personne ne voit rien.",
-        time:"10h45", tags:["k"], dur:5
-      },
-      {
-        id:"cc_midi", slot:"pause",
-        title:"Cohérence cardiaque — Pause déj",
-        desc:"5 sec inspirer / 5 sec expirer. 5 min. Idéalement debout ou en marchant dehors.",
-        time:"13h00", tags:["b"], dur:5
-      },
-      {
-        id:"kegel_base_2", slot:"pause",
-        title:"Kegel de base — Contraction lente (Série 2)",
-        desc:"2e série de la journée : contracter 10 sec → relâcher 10 sec. 10 reps. Quotidien, 2× par jour comme indiqué dans l'Excel.",
-        time:"14h00", tags:["k"], dur:5
-      },
-      {
-        id:"sport", slot:"soir",
-        title:"Cardio léger (3× / semaine)",
-        desc:"30 min de marche rapide, vélo ou natation. Respiration abdominale consciente : gonfler le ventre, pas la poitrine.",
-        time:"19h00", tags:["s"], dur:30
-      },
-      {
-        id:"cc_soir", slot:"soir",
-        title:"Cohérence cardiaque — Soir",
-        desc:"3e séance de cohérence cardiaque. 5 min en rentrant. Finalise les 3×/jour obligatoires cette semaine.",
-        time:"19h30", tags:["b"], dur:5
-      },
-      {
-        id:"stop_start", slot:"nuit",
-        title:"Stop & Start — Solo (5 min de plateau)",
-        desc:"Monter à 7–8/10 d'excitation → stopper TOUTE stimulation → redescendre à 4/10 → recommencer. Objectif sem. 1-2 : tenir 5 min de plateau au total. (Masters & Johnson, 1970)",
-        time:"21h00", tags:["t"], dur:20
-      },
-      {
-        id:"kegel_nuit", slot:"nuit",
-        title:"Kegel de nuit — Isométrique léger",
-        desc:"20 contractions très douces allongé avant de dormir, sans tension. Coordonner avec la respiration. Conscience corporelle pure.",
-        time:"22h00", tags:["k"], dur:5
-      },
-      {
-        id:"resp_478", slot:"nuit",
-        title:"Respiration 4-7-8 — Avant sommeil",
-        desc:"Inspirer 4 sec → retenir 7 sec → expirer lentement 8 sec. 4 cycles minimum. Active le parasympathique, prépare au sommeil.",
-        time:"22h15", tags:["b"], dur:3
-      },
+    phase:"FONDATION", objectif:"Renforcement de base du PC + conscience corporelle + hydratation", duree:"~30 min / jour",
+    tasks:[
+      {id:"eau_matin",  title:"💧 Eau — Réveil",                        desc:"Boire 500ml d'eau dès le réveil, avant tout. Poser une bouteille la veille au soir pour ne pas oublier. Réhydrate le corps après 8h de jeûne.",                                                                                    time:"07h00", tags:["e"], dur:1},
+      {id:"eau_10h",    title:"💧 Eau — 10h",                            desc:"Boire 250ml. Poser la bouteille sur le bureau, visible. Ne pas attendre d'avoir soif.",                                                                                                                                             time:"10h00", tags:["e"], dur:1},
+      {id:"cc_matin",   title:"🫁 Cohérence cardiaque — Matin",          desc:"Inspirer 5 sec par le nez → expirer 5 sec par la bouche. Répéter pendant 5 min assis à ton bureau. Active le parasympathique et réduit le cortisol. 1re séance sur 3 aujourd'hui.",                                               time:"10h30", tags:["b"], dur:5},
+      {id:"k1",         title:"💪 Kegel de base — Série 1",              desc:"Contracter le muscle PC comme pour retenir l'urine → tenir 10 sec → relâcher lentement 10 sec. Répéter 10 fois. Assis à ton bureau, personne ne voit rien. Ne pas contracter les fessiers.",                                      time:"10h45", tags:["k"], dur:5},
+      {id:"eau_13h",    title:"💧 Eau — 13h",                            desc:"Boire 250ml pendant ou juste après la pause déjeuner.",                                                                                                                                                                             time:"13h00", tags:["e"], dur:1},
+      {id:"cc_midi",    title:"🫁 Cohérence cardiaque — Midi",           desc:"Inspirer 5 sec par le nez → expirer 5 sec par la bouche. Répéter pendant 5 min. 2e séance sur 3 aujourd'hui.",                                                                                                                     time:"13h30", tags:["b"], dur:5},
+      {id:"k2",         title:"💪 Kegel de base — Série 2",              desc:"Contracter le muscle PC → tenir 10 sec → relâcher 10 sec. Répéter 10 fois. 2e série de la journée obligatoire semaines 1-2.",                                                                                                      time:"14h00", tags:["k"], dur:5},
+      {id:"eau_16h",    title:"💧 Eau — 16h",                            desc:"Boire 250ml. Évite le coup de fatigue de fin d'après-midi.",                                                                                                                                                                        time:"16h00", tags:["e"], dur:1},
+      {id:"sport",      title:"🚴 Vélo — 20 min",                        desc:"Pédaler 20 min à allure modérée. Respiration abdominale pendant tout l'effort : gonfler le ventre à l'inspiration, pas la poitrine. 3 fois cette semaine.",                                                                        time:"19h00", tags:["s"], dur:20},
+      {id:"etirements",  title:"🧘 Étirements — Après sport",               desc:"APRÈS le sport uniquement, jamais avant à froid. Enchaîner : ischio-jambiers debout (30 sec chaque jambe) + quadriceps debout (30 sec chaque jambe) + hanches au sol (30 sec chaque côté) + pectoraux contre un mur (30 sec) + dos en boule au sol (30 sec). Total 5-8 min.", time:"19h45", tags:["s"], dur:8},
+      {id:"cc_soir",    title:"🫁 Cohérence cardiaque — Soir",           desc:"Inspirer 5 sec par le nez → expirer 5 sec par la bouche. Répéter pendant 5 min. 3e et dernière séance de la journée.",                                                                                                            time:"19h30", tags:["b"], dur:5},
+      {id:"stop_start", title:"🛑 Stop & Start — 5 min de plateau",      desc:"Monter à 7–8/10 d'excitation → stopper TOUTE stimulation → redescendre à 4/10 → recommencer. Objectif : cumuler 5 min passées au plateau. Jambes relâchées, fessiers non contractés, respiration abdominale. (Masters & Johnson, 1970)",  time:"21h00", tags:["t"], dur:20},
+      {id:"k_nuit",     title:"💪 Kegel de nuit — Isométrique léger",    desc:"20 contractions très douces allongé dans le lit. 1 sec contracté / 1 sec relâché. Coordonner avec la respiration. Très doux, sans forcer. Conscience corporelle pure avant le sommeil.",                                          time:"22h00", tags:["k"], dur:5},
+      {id:"resp_478",   title:"🫁 Respiration 4-7-8 — Avant sommeil",    desc:"Inspirer 4 sec → retenir 7 sec → expirer lentement 8 sec. Répéter 4 cycles minimum. Active le parasympathique et prépare au sommeil. Écrans éteints.",                                                                             time:"22h15", tags:["b"], dur:3},
+      {id:"sommeil",    title:"🌙 Coucher avant 23h",                    desc:"Chambre fraîche (18-20°C), obscurité totale, écrans éteints 1h avant. Le sommeil régule testostérone et sérotonine — les deux hormones du contrôle. Priorité absolue du programme.",                                              time:"22h30", tags:["v"], dur:0},
     ]
   },
 
-  // ── SEMAINES 3-4 : RENFORCEMENT ─────────────────────────────
-  // Kegel : Kegel lent + rapide × 2/jour
-  // Technique : Stop & Start (10 min) + mindful scan
-  // Respiration : 4-7-8 avant séances
-  // Durée : 25-30 min
   "3-4": {
-    phase: "RENFORCEMENT",
-    objectif: "Augmenter endurance du PC + durée de plateau",
-    duree: "25–30 min / jour",
-    tasks: [
-      {
-        id:"cc_matin", slot:"bureau",
-        title:"Cohérence cardiaque — Matin",
-        desc:"5 sec / 5 sec pendant 5 min. Maintenir l'habitude des 3×/jour. Base de régulation du SNA.",
-        time:"10h30", tags:["b"], dur:5
-      },
-      {
-        id:"kegel_lent", slot:"bureau",
-        title:"Kegel de maintien progressif — Lent",
-        desc:"Augmenter progressivement la durée : 5s → 10s → 15s → 20s de contraction. 5 répétitions à chaque palier. Endurance musculaire du PC. (Niveau intermédiaire)",
-        time:"10h45", tags:["k"], dur:8
-      },
-      {
-        id:"kegel_rapide", slot:"bureau",
-        title:"Kegel rapide — Fast Kegel",
-        desc:"Contractions rapides et rythmées : 1 sec contracté / 1 sec relâché. 30 contractions × 3 séries. Réactivité neuromusculaire.",
-        time:"11h15", tags:["k"], dur:5
-      },
-      {
-        id:"cc_midi", slot:"pause",
-        title:"Cohérence cardiaque — Pause déj",
-        desc:"5 min. 2e séance de la journée.",
-        time:"13h00", tags:["b"], dur:5
-      },
-      {
-        id:"mindful_scan", slot:"pause",
-        title:"Balayage corporel — Mindful scan",
-        desc:"Scanner mentalement le corps des pieds à la tête. Observer les tensions pelviennes sans les juger. 5 min assis. (Mindfulness somatique — intégré au Stop & Start en séance).",
-        time:"15h00", tags:["m"], dur:5
-      },
-      {
-        id:"sport", slot:"soir",
-        title:"Cardio léger (3× / semaine)",
-        desc:"30 min. Respiration abdominale pendant tout l'effort.",
-        time:"19h00", tags:["s"], dur:30
-      },
-      {
-        id:"cc_soir", slot:"soir",
-        title:"Cohérence cardiaque — Soir",
-        desc:"5 min. 3e séance.",
-        time:"19h30", tags:["b"], dur:5
-      },
-      {
-        id:"resp_478_avant", slot:"nuit",
-        title:"Respiration 4-7-8 — Avant séance",
-        desc:"Inspirer 4 sec → retenir 7 sec → expirer 8 sec. 4 cycles avant de commencer le Stop & Start. Nouveau en sem. 3-4 : préparer le SNA avant la séance.",
-        time:"20h45", tags:["b"], dur:3
-      },
-      {
-        id:"stop_start_10", slot:"nuit",
-        title:"Stop & Start — Solo (10 min de plateau)",
-        desc:"Monter à 7–8/10 → stopper → redescendre à 4/10 → reprendre. Objectif sem. 3-4 : 10 min de plateau au total. Intégrer le balayage corporel pendant la séance.",
-        time:"21h00", tags:["t"], dur:25
-      },
-      {
-        id:"kegel_lent_2", slot:"nuit",
-        title:"Kegel lent — Série 2 (soirée)",
-        desc:"2e série du jour : maintien progressif 5s→10s→15s→20s. 5 reps à chaque palier. Quotidien × 2/jour comme indiqué dans l'Excel.",
-        time:"22h00", tags:["k"], dur:8
-      },
-      {
-        id:"resp_478", slot:"nuit",
-        title:"Respiration 4-7-8 — Sommeil",
-        desc:"4 cycles. Écrans éteints. Devenir automatique.",
-        time:"22h20", tags:["b"], dur:3
-      },
+    phase:"RENFORCEMENT", objectif:"Endurance du PC + durée de plateau + 4-7-8 avant séance", duree:"~40 min / jour",
+    tasks:[
+      {id:"eau_matin",  title:"💧 Eau — Réveil",                         desc:"Boire 500ml d'eau dès le réveil, avant tout. Poser une bouteille la veille au soir pour ne pas oublier.",                                                                                                                          time:"07h00", tags:["e"], dur:1},
+      {id:"eau_10h",    title:"💧 Eau — 10h",                            desc:"Boire 250ml. Bouteille sur le bureau, visible.",                                                                                                                                                                                    time:"10h00", tags:["e"], dur:1},
+      {id:"cc_matin",   title:"🫁 Cohérence cardiaque — Matin",          desc:"Inspirer 5 sec par le nez → expirer 5 sec par la bouche. Répéter pendant 5 min assis à ton bureau. 1re séance sur 3.",                                                                                                            time:"10h30", tags:["b"], dur:5},
+      {id:"k_lent",     title:"💪 Kegel maintien progressif — Série 1",  desc:"Augmenter la durée de contraction progressivement : 5 sec → 10 sec → 15 sec → 20 sec. 5 répétitions à chaque palier. Ne pas contracter les fessiers. Développe l'endurance musculaire du PC.",                                  time:"10h45", tags:["k"], dur:8},
+      {id:"eau_13h",    title:"💧 Eau — 13h",                            desc:"Boire 250ml pendant ou juste après la pause déjeuner.",                                                                                                                                                                             time:"13h00", tags:["e"], dur:1},
+      {id:"cc_midi",    title:"🫁 Cohérence cardiaque — Midi",           desc:"Inspirer 5 sec par le nez → expirer 5 sec par la bouche. Répéter pendant 5 min. 2e séance sur 3.",                                                                                                                                 time:"13h30", tags:["b"], dur:5},
+      {id:"k_rapide",   title:"💪 Kegel rapide — Fast Kegel",            desc:"1 sec contracté / 1 sec relâché en séquence rapide et rythmée. 30 contractions × 3 séries. Développe la réactivité neuromusculaire du PC. Discrèt assis.",                                                                       time:"14h00", tags:["k"], dur:5},
+      {id:"eau_16h",    title:"💧 Eau — 16h",                            desc:"Boire 250ml. Évite le coup de fatigue de fin d'après-midi.",                                                                                                                                                                        time:"16h00", tags:["e"], dur:1},
+      {id:"sport",      title:"🚴 Vélo 25 min + Pompes",                 desc:"Vélo 25 min à allure modérée. Enchaîner avec 3 séries de 10 pompes. Respiration abdominale pendant tout l'effort. 3 fois cette semaine.",                                                                                          time:"19h00", tags:["s"], dur:30},
+      {id:"etirements",  title:"🧘 Étirements — Après sport",               desc:"APRÈS le sport uniquement, jamais avant à froid. Enchaîner : ischio-jambiers debout (30 sec chaque jambe) + quadriceps debout (30 sec chaque jambe) + hanches au sol (30 sec chaque côté) + pectoraux contre un mur (30 sec) + dos en boule au sol (30 sec). Total 5-8 min.", time:"19h45", tags:["s"], dur:8},
+      {id:"cc_soir",    title:"🫁 Cohérence cardiaque — Soir",           desc:"Inspirer 5 sec par le nez → expirer 5 sec par la bouche. Répéter pendant 5 min. 3e et dernière séance de la journée.",                                                                                                            time:"19h30", tags:["b"], dur:5},
+      {id:"resp_478_av",title:"🫁 Respiration 4-7-8 — Avant séance",     desc:"Inspirer 4 sec → retenir 7 sec → expirer lentement 8 sec. Répéter 4 cycles avant de commencer le Stop & Start. NOUVEAU sem. 3-4 : prépare le système nerveux avant la séance.",                                                   time:"20h50", tags:["b"], dur:3},
+      {id:"stop_start", title:"🛑 Stop & Start — 10 min de plateau",     desc:"Monter à 7–8/10 → stopper TOUTE stimulation → redescendre à 4/10 → recommencer. Objectif : 10 min de plateau cumulé. Intégrer le balayage corporel (scanner le corps des pieds à la tête) pendant la séance. Jambes relâchées.",  time:"21h00", tags:["t"], dur:25},
+      {id:"k_lent2",    title:"💪 Kegel maintien progressif — Série 2",  desc:"2e série du jour : 5 sec → 10 sec → 15 sec → 20 sec de contraction. 5 reps à chaque palier. 2× par jour obligatoire semaines 3-4.",                                                                                               time:"22h00", tags:["k"], dur:8},
+      {id:"resp_478",   title:"🫁 Respiration 4-7-8 — Avant sommeil",    desc:"Inspirer 4 sec → retenir 7 sec → expirer lentement 8 sec. Répéter 4 cycles. Écrans éteints.",                                                                                                                                      time:"22h20", tags:["b"], dur:3},
+      {id:"sommeil",    title:"🌙 Coucher avant 23h",                    desc:"Chambre fraîche (18-20°C), obscurité totale, écrans éteints. Priorité absolue.",                                                                                                                                                    time:"22h30", tags:["v"], dur:0},
     ]
   },
 
-  // ── SEMAINES 5-6 : CONTRÔLE ─────────────────────────────────
-  // Kegel : Kegel en escalier + Reverse Kegel
-  // Technique : Squeeze technique + edging 15 min
-  // Respiration : Abdominale + expiration longue
-  // Durée : 30-35 min
   "5-6": {
-    phase: "CONTRÔLE",
-    objectif: "Maîtrise de la montée + seuil d'excitation",
-    duree: "30–35 min / jour",
-    tasks: [
-      {
-        id:"cc_matin", slot:"bureau",
-        title:"Cohérence cardiaque — Matin",
-        desc:"5 min. Routine ancrée.",
-        time:"10h30", tags:["b"], dur:5
-      },
-      {
-        id:"kegel_escalier", slot:"bureau",
-        title:"Kegel en escalier",
-        desc:"Contracter par paliers : 25% → 50% → 75% → 100% de force → redescendre. 5 cycles complets. Contrôle graduel et précision. (Niveau intermédiaire)",
-        time:"10h45", tags:["k"], dur:8
-      },
-      {
-        id:"reverse_kegel", slot:"bureau",
-        title:"Reverse Kegel — Relâchement actif",
-        desc:"Pousser DOUCEMENT vers l'extérieur (l'inverse exact du Kegel) → maintenir 5 sec → relâcher. 10 répétitions. Technique anti-réflexe directe. NOUVEAU en sem. 5-6.",
-        time:"11h05", tags:["k"], dur:5
-      },
-      {
-        id:"resp_abdo", slot:"pause",
-        title:"Respiration abdominale profonde",
-        desc:"Gonfler le ventre à l'inspiration, pas la poitrine. Engagement du diaphragme. 10 cycles lents. Relâche la tension pelvienne — crucial pendant l'acte.",
-        time:"13h00", tags:["b"], dur:5
-      },
-      {
-        id:"expiration_longue", slot:"pause",
-        title:"Entraînement — Expiration longue",
-        desc:"Quand l'excitation monte (simuler mentalement) : expirer LENTEMENT et longuement 8–10 sec. 10 répétitions. Décharge l'énergie nerveuse sympathique. À automatiser pour les séances.",
-        time:"15h00", tags:["b","m"], dur:5
-      },
-      {
-        id:"sport", slot:"soir",
-        title:"Cardio léger (3× / semaine)",
-        desc:"30 min. Respiration abdominale pendant tout l'effort.",
-        time:"19h00", tags:["s"], dur:30
-      },
-      {
-        id:"cc_soir", slot:"soir",
-        title:"Cohérence cardiaque — Soir",
-        desc:"5 min.",
-        time:"19h30", tags:["b"], dur:5
-      },
-      {
-        id:"resp_478_avant", slot:"nuit",
-        title:"Respiration 4-7-8 — Avant séance",
-        desc:"4 cycles. Préparer le SNA avant la séance de Squeeze + Edging.",
-        time:"20h45", tags:["b"], dur:3
-      },
-      {
-        id:"squeeze_edging", slot:"nuit",
-        title:"Squeeze + Edging — 15 min de plateau",
-        desc:"Stop & Start classique. Quand à 8/10 : squeeze ferme sur le frein 10–15 sec → attendre → reprendre. Objectif : maintenir le plateau 15 min. (Semans, 1956 — cliniquement éprouvée)",
-        time:"21h00", tags:["t"], dur:30
-      },
-      {
-        id:"reverse_kegel_nuit", slot:"nuit",
-        title:"Reverse Kegel de nuit",
-        desc:"10 Reverse Kegel doux allongé. Coordonner avec la respiration. Alternance Kegel/Reverse dans la même séance.",
-        time:"22h00", tags:["k"], dur:5
-      },
-      {
-        id:"resp_478", slot:"nuit",
-        title:"Respiration 4-7-8 — Sommeil",
-        desc:"4 cycles.",
-        time:"22h15", tags:["b"], dur:3
-      },
+    phase:"CONTRÔLE", objectif:"Reverse Kegel + Squeeze + Edging 15 min + respiration abdominale", duree:"~45 min / jour",
+    tasks:[
+      {id:"eau_matin",  title:"💧 Eau — Réveil",                         desc:"Boire 500ml d'eau dès le réveil, avant tout.",                                                                                                                                                                                      time:"07h00", tags:["e"], dur:1},
+      {id:"eau_10h",    title:"💧 Eau — 10h",                            desc:"Boire 250ml. Bouteille sur le bureau, visible.",                                                                                                                                                                                    time:"10h00", tags:["e"], dur:1},
+      {id:"cc_matin",   title:"🫁 Cohérence cardiaque — Matin",          desc:"Inspirer 5 sec par le nez → expirer 5 sec par la bouche. Répéter pendant 5 min assis à ton bureau.",                                                                                                                               time:"10h30", tags:["b"], dur:5},
+      {id:"k_escalier", title:"💪 Kegel en escalier",                    desc:"Contracter par paliers : 25% → 50% → 75% → 100% de force → redescendre en sens inverse. 5 cycles complets. Ne pas contracter les fessiers. Contrôle graduel et précision musculaire.",                                           time:"10h45", tags:["k"], dur:8},
+      {id:"k_reverse",  title:"💪 Reverse Kegel — NOUVEAU sem. 5-6",    desc:"Pousser DOUCEMENT vers l'extérieur, comme si tu voulais expulser de l'air — c'est l'inverse exact du Kegel. Maintenir 5 sec → relâcher complètement. 10 répétitions. Technique anti-réflexe directe au moment critique.",       time:"11h05", tags:["k"], dur:5},
+      {id:"eau_13h",    title:"💧 Eau — 13h",                            desc:"Boire 250ml.",                                                                                                                                                                                                                      time:"13h00", tags:["e"], dur:1},
+      {id:"cc_midi",    title:"🫁 Cohérence cardiaque — Midi",           desc:"Inspirer 5 sec par le nez → expirer 5 sec par la bouche. Répéter pendant 5 min.",                                                                                                                                                  time:"13h30", tags:["b"], dur:5},
+      {id:"resp_abdo",  title:"🫁 Respiration abdominale profonde",      desc:"Gonfler le ventre à l'inspiration (pas la poitrine) — engagement du diaphragme. Expirer lentement et complètement. 10 cycles lents. Relâche la tension pelvienne. NOUVEAU sem. 5-6.",                                            time:"15h00", tags:["b"], dur:5},
+      {id:"eau_16h",    title:"💧 Eau — 16h",                            desc:"Boire 250ml.",                                                                                                                                                                                                                      time:"16h00", tags:["e"], dur:1},
+      {id:"sport",      title:"🚴 Vélo 30 min + Pompes + Gainage",       desc:"Vélo 30 min. Enchaîner : 3×12 pompes + 3×30 sec de gainage ventral (planche). Respiration abdominale pendant tout l'effort. 3 fois cette semaine.",                                                                                time:"19h00", tags:["s"], dur:40},
+      {id:"etirements",  title:"🧘 Étirements — Après sport",               desc:"APRÈS le sport uniquement, jamais avant à froid. Enchaîner : ischio-jambiers debout (30 sec chaque jambe) + quadriceps debout (30 sec chaque jambe) + hanches au sol (30 sec chaque côté) + pectoraux contre un mur (30 sec) + dos en boule au sol (30 sec). Total 5-8 min.", time:"19h45", tags:["s"], dur:8},
+      {id:"cc_soir",    title:"🫁 Cohérence cardiaque — Soir",           desc:"Inspirer 5 sec par le nez → expirer 5 sec par la bouche. Répéter pendant 5 min.",                                                                                                                                                  time:"19h30", tags:["b"], dur:5},
+      {id:"resp_478_av",title:"🫁 Respiration 4-7-8 — Avant séance",     desc:"Inspirer 4 sec → retenir 7 sec → expirer lentement 8 sec. Répéter 4 cycles avant la séance de Squeeze.",                                                                                                                           time:"20h50", tags:["b"], dur:3},
+      {id:"squeeze",    title:"✊ Squeeze + Edging — 15 min plateau",    desc:"Stop & Start classique. Quand tu atteins 8/10 : squeeze ferme sur le frein pendant 10–15 sec → attendre que ça redescende → reprendre. Objectif : 15 min de plateau cumulé. Jambes relâchées. (Semans, 1956)",                   time:"21h00", tags:["t"], dur:30},
+      {id:"k_rev_nuit", title:"💪 Reverse Kegel — Nuit",                 desc:"Pousser doucement vers l'extérieur → maintenir 5 sec → relâcher. 10 répétitions allongé dans le lit. Alterner avec quelques Kegel classiques dans la même séance.",                                                               time:"22h00", tags:["k"], dur:5},
+      {id:"resp_478",   title:"🫁 Respiration 4-7-8 — Avant sommeil",    desc:"Inspirer 4 sec → retenir 7 sec → expirer lentement 8 sec. Répéter 4 cycles.",                                                                                                                                                      time:"22h15", tags:["b"], dur:3},
+      {id:"sommeil",    title:"🌙 Coucher avant 23h",                    desc:"Chambre fraîche (18-20°C), obscurité totale, écrans éteints. Priorité absolue.",                                                                                                                                                    time:"22h30", tags:["v"], dur:0},
     ]
   },
 
-  // ── SEMAINES 7-8 : INTÉGRATION ──────────────────────────────
-  // Kegel : Tous exercices PC × 1/jour
-  // Technique : Edging 20 min + balayage corporel
-  // Respiration : Respiration inversée au seuil critique
-  // Durée : 30 min
   "7-8": {
-    phase: "INTÉGRATION",
-    objectif: "Transférer les acquis en situation réelle",
-    duree: "30 min / jour",
-    tasks: [
-      {
-        id:"cc_matin", slot:"bureau",
-        title:"Cohérence cardiaque — Matin",
-        desc:"5 min. Automatique.",
-        time:"10h30", tags:["b"], dur:5
-      },
-      {
-        id:"kegel_complet", slot:"bureau",
-        title:"Programme PC complet — Tous exercices × 1/jour",
-        desc:"Bloc unique : Kegel lent (5 reps × 15 sec) + Kegel escalier (3 cycles 25%→100%) + Fast Kegel (30 × 3 séries) + Reverse Kegel (10 × 5 sec). Tous exercices en une séance.",
-        time:"10h45", tags:["k"], dur:15
-      },
-      {
-        id:"mindful_scan", slot:"pause",
-        title:"Balayage corporel profond",
-        desc:"15 min. Observer les sensations avec précision. Visualiser la détente pelvienne. Intégrer l'expiration longue sur chaque tension détectée. (Mindfulness somatique)",
-        time:"13h00", tags:["m"], dur:15
-      },
-      {
-        id:"resp_inversee_entrainement", slot:"pause",
-        title:"Entraînement — Respiration inversée",
-        desc:"Inspirer court → retenir 2 sec → expirer très lentement (10 sec). 8 cycles. NOUVELLE technique sem. 7-8 : à automatiser pour le moment critique.",
-        time:"15h00", tags:["b"], dur:5
-      },
-      {
-        id:"sport", slot:"soir",
-        title:"Cardio léger (3× / semaine)",
-        desc:"30 min.",
-        time:"19h00", tags:["s"], dur:30
-      },
-      {
-        id:"cc_soir", slot:"soir",
-        title:"Cohérence cardiaque — Soir",
-        desc:"5 min.",
-        time:"19h30", tags:["b"], dur:5
-      },
-      {
-        id:"resp_478_avant", slot:"nuit",
-        title:"Respiration 4-7-8 — Avant séance",
-        desc:"4 cycles. Préparer le SNA.",
-        time:"20h45", tags:["b"], dur:3
-      },
-      {
-        id:"edging_20", slot:"nuit",
-        title:"Edging — 20 min de plateau + balayage",
-        desc:"Rester à 7–8/10 le plus longtemps possible. Balayage corporel intégré pendant la séance. Au seuil critique : déclencher la respiration inversée (inspirer court → expirer 10 sec). Toutes techniques ensemble.",
-        time:"21h00", tags:["t","m"], dur:35
-      },
-      {
-        id:"resp_478", slot:"nuit",
-        title:"Respiration 4-7-8 — Sommeil",
-        desc:"4 cycles.",
-        time:"22h15", tags:["b"], dur:3
-      },
+    phase:"INTÉGRATION", objectif:"Programme PC complet + Edging 20 min + respiration inversée NOUVEAU", duree:"~50 min / jour",
+    tasks:[
+      {id:"eau_matin",  title:"💧 Eau — Réveil",                         desc:"Boire 500ml d'eau dès le réveil, avant tout.",                                                                                                                                                                                      time:"07h00", tags:["e"], dur:1},
+      {id:"eau_10h",    title:"💧 Eau — 10h",                            desc:"Boire 250ml. Bouteille sur le bureau, visible.",                                                                                                                                                                                    time:"10h00", tags:["e"], dur:1},
+      {id:"cc_matin",   title:"🫁 Cohérence cardiaque — Matin",          desc:"Inspirer 5 sec par le nez → expirer 5 sec par la bouche. Répéter pendant 5 min assis à ton bureau.",                                                                                                                               time:"10h30", tags:["b"], dur:5},
+      {id:"k_complet",  title:"💪 Programme PC complet — Bloc unique",   desc:"Tout en une séance : Kegel lent (5 reps × 15 sec) + Kegel en escalier (3 cycles 25%→100%) + Fast Kegel (30 contractions × 3 séries) + Reverse Kegel (10 reps × 5 sec). Ne pas contracter les fessiers. 1× par jour.",          time:"10h45", tags:["k"], dur:15},
+      {id:"eau_13h",    title:"💧 Eau — 13h",                            desc:"Boire 250ml.",                                                                                                                                                                                                                      time:"13h00", tags:["e"], dur:1},
+      {id:"cc_midi",    title:"🫁 Cohérence cardiaque — Midi",           desc:"Inspirer 5 sec par le nez → expirer 5 sec par la bouche. Répéter pendant 5 min.",                                                                                                                                                  time:"13h30", tags:["b"], dur:5},
+      {id:"resp_inv",   title:"🫁 Respiration inversée — Entraînement",  desc:"Inspirer court (2 sec) → retenir 2 sec → expirer très lentement pendant 10 sec. Répéter 8 cycles. NOUVEAU sem. 7-8 : à automatiser pour l'utiliser au moment critique pendant la séance.",                                       time:"15h00", tags:["b"], dur:5},
+      {id:"eau_16h",    title:"💧 Eau — 16h",                            desc:"Boire 250ml.",                                                                                                                                                                                                                      time:"16h00", tags:["e"], dur:1},
+      {id:"sport",      title:"🚴 Vélo 30 min + Pompes + Dips + Gainage",desc:"Vélo 30 min. Enchaîner : 3×15 pompes + 3×10 dips sur chaise + 3×45 sec de gainage ventral. Respiration abdominale pendant tout l'effort. 3 fois cette semaine.",                                                                   time:"19h00", tags:["s"], dur:50},
+      {id:"etirements",  title:"🧘 Étirements — Après sport",               desc:"APRÈS le sport uniquement, jamais avant à froid. Enchaîner : ischio-jambiers debout (30 sec chaque jambe) + quadriceps debout (30 sec chaque jambe) + hanches au sol (30 sec chaque côté) + pectoraux contre un mur (30 sec) + dos en boule au sol (30 sec). Total 5-8 min.", time:"19h45", tags:["s"], dur:8},
+      {id:"cc_soir",    title:"🫁 Cohérence cardiaque — Soir",           desc:"Inspirer 5 sec par le nez → expirer 5 sec par la bouche. Répéter pendant 5 min.",                                                                                                                                                  time:"19h30", tags:["b"], dur:5},
+      {id:"resp_478_av",title:"🫁 Respiration 4-7-8 — Avant séance",     desc:"Inspirer 4 sec → retenir 7 sec → expirer lentement 8 sec. Répéter 4 cycles avant la séance d'Edging.",                                                                                                                             time:"20h50", tags:["b"], dur:3},
+      {id:"edging",     title:"🌊 Edging — 20 min plateau + balayage",   desc:"Rester à 7–8/10 le plus longtemps possible. Scanner le corps des pieds à la tête pendant la séance (balayage corporel). Au moment critique (8-9/10) : inspirer court (2 sec) → retenir 2 sec → expirer 10 sec (respiration inversée). Jambes relâchées.",  time:"21h00", tags:["t","m"], dur:35},
+      {id:"resp_478",   title:"🫁 Respiration 4-7-8 — Avant sommeil",    desc:"Inspirer 4 sec → retenir 7 sec → expirer lentement 8 sec. Répéter 4 cycles.",                                                                                                                                                      time:"22h15", tags:["b"], dur:3},
+      {id:"sommeil",    title:"🌙 Coucher avant 23h",                    desc:"Chambre fraîche (18-20°C), obscurité totale, écrans éteints. Priorité absolue.",                                                                                                                                                    time:"22h30", tags:["v"], dur:0},
     ]
   },
 
-  // ── SEMAINES 9-10 : CONSOLIDATION ───────────────────────────
-  // Kegel : maintenance × 1/jour
-  // Technique : Sessions libres avec techniques intégrées
-  // Respiration : Toutes techniques intégrées naturellement
-  // Durée : 20-25 min
   "9-10": {
-    phase: "CONSOLIDATION",
-    objectif: "Maintenir les gains + réduire la charge mentale",
-    duree: "20–25 min / jour",
-    tasks: [
-      {
-        id:"cc_matin", slot:"bureau",
-        title:"Cohérence cardiaque — Matin",
-        desc:"5 min. Naturelle.",
-        time:"10h30", tags:["b"], dur:5
-      },
-      {
-        id:"kegel_maint", slot:"bureau",
-        title:"Kegel maintenance × 1/jour",
-        desc:"Programme allégé : Kegel lent (5 reps) + Escalier (3 cycles) + Reverse Kegel (8 reps). 12 min max. Maintien des acquis sans surcharge.",
-        time:"11h00", tags:["k"], dur:12
-      },
-      {
-        id:"sport", slot:"soir",
-        title:"Cardio léger (3× / semaine)",
-        desc:"30 min. Sport plaisir.",
-        time:"19h00", tags:["s"], dur:30
-      },
-      {
-        id:"cc_soir", slot:"soir",
-        title:"Cohérence cardiaque — Soir",
-        desc:"5 min.",
-        time:"19h30", tags:["b"], dur:5
-      },
-      {
-        id:"session_libre", slot:"nuit",
-        title:"Session libre — Techniques intégrées",
-        desc:"Pratique libre. Toutes les techniques doivent être intégrées naturellement : Stop & Start, Squeeze, Reverse Kegel, respiration inversée. Réduire la charge mentale consciente. Observer les progrès.",
-        time:"21h00", tags:["t"], dur:20
-      },
-      {
-        id:"resp_478", slot:"nuit",
-        title:"Respiration 4-7-8 — Sommeil",
-        desc:"4 cycles. Naturel.",
-        time:"22h15", tags:["b"], dur:3
-      },
+    phase:"CONSOLIDATION", objectif:"Maintien des acquis + automatisation progressive + sport intensifié", duree:"~55 min / jour",
+    tasks:[
+      {id:"eau_matin",  title:"💧 Eau — Réveil",                         desc:"Boire 500ml d'eau dès le réveil, avant tout.",                                                                                                                                                                                      time:"07h00", tags:["e"], dur:1},
+      {id:"eau_10h",    title:"💧 Eau — 10h",                            desc:"Boire 250ml. Bouteille sur le bureau, visible.",                                                                                                                                                                                    time:"10h00", tags:["e"], dur:1},
+      {id:"cc_matin",   title:"🫁 Cohérence cardiaque — Matin",          desc:"Inspirer 5 sec par le nez → expirer 5 sec par la bouche. Répéter pendant 5 min assis à ton bureau.",                                                                                                                               time:"10h30", tags:["b"], dur:5},
+      {id:"k_maint",    title:"💪 Kegel maintenance — 1× par jour",      desc:"Programme allégé en un seul bloc : Kegel lent (5 reps × 15 sec) + Escalier (3 cycles 25%→100%) + Reverse Kegel (8 reps × 5 sec). 12 min max. Maintien des acquis sans surcharge.",                                               time:"11h00", tags:["k"], dur:12},
+      {id:"eau_13h",    title:"💧 Eau — 13h",                            desc:"Boire 250ml.",                                                                                                                                                                                                                      time:"13h00", tags:["e"], dur:1},
+      {id:"cc_midi",    title:"🫁 Cohérence cardiaque — Midi",           desc:"Inspirer 5 sec par le nez → expirer 5 sec par la bouche. Répéter pendant 5 min.",                                                                                                                                                  time:"13h30", tags:["b"], dur:5},
+      {id:"eau_16h",    title:"💧 Eau — 16h",                            desc:"Boire 250ml.",                                                                                                                                                                                                                      time:"16h00", tags:["e"], dur:1},
+      {id:"sport",      title:"🚴 Vélo 35 min + Pompes + Dips + Tractions + Gainage", desc:"Vélo 35 min. Enchaîner : 3×15 pompes + 3×12 dips sur chaise + 3×5 tractions (ou tirage élastique) + 3×50 sec de gainage ventral. Respiration abdominale pendant tout l'effort. 3 fois cette semaine.",               time:"19h00", tags:["s"], dur:55},
+      {id:"etirements",  title:"🧘 Étirements — Après sport",               desc:"APRÈS le sport uniquement, jamais avant à froid. Enchaîner : ischio-jambiers debout (30 sec chaque jambe) + quadriceps debout (30 sec chaque jambe) + hanches au sol (30 sec chaque côté) + pectoraux contre un mur (30 sec) + dos en boule au sol (30 sec). Total 5-8 min.", time:"19h45", tags:["s"], dur:8},
+      {id:"cc_soir",    title:"🫁 Cohérence cardiaque — Soir",           desc:"Inspirer 5 sec par le nez → expirer 5 sec par la bouche. Répéter pendant 5 min.",                                                                                                                                                  time:"19h30", tags:["b"], dur:5},
+      {id:"resp_478_av",title:"🫁 Respiration 4-7-8 — Avant séance",     desc:"Inspirer 4 sec → retenir 7 sec → expirer lentement 8 sec. Répéter 4 cycles avant la séance.",                                                                                                                                      time:"20h50", tags:["b"], dur:3},
+      {id:"session",    title:"🌊 Session libre — Toutes techniques",    desc:"Pratique libre. Intégrer naturellement : Stop & Start (monter à 7-8/10 → stopper → 4/10), Squeeze sur le frein (10-15 sec à 8/10), Reverse Kegel au moment critique, respiration inversée (2 sec inspirer → 10 sec expirer). Jambes relâchées.", time:"21h00", tags:["t"], dur:20},
+      {id:"resp_478",   title:"🫁 Respiration 4-7-8 — Avant sommeil",    desc:"Inspirer 4 sec → retenir 7 sec → expirer lentement 8 sec. Répéter 4 cycles.",                                                                                                                                                      time:"22h15", tags:["b"], dur:3},
+      {id:"sommeil",    title:"🌙 Coucher avant 23h",                    desc:"Chambre fraîche (18-20°C), obscurité totale, écrans éteints. Priorité absolue.",                                                                                                                                                    time:"22h30", tags:["v"], dur:0},
     ]
   },
 
-  // ── SEMAINES 11-12 : MAÎTRISE ───────────────────────────────
-  // Kegel : 3–4/semaine (pas tous les jours)
-  // Technique : Pratique libre, sans protocole rigide
-  // Respiration : Respiration naturelle et consciente
-  // Durée : 15-20 min
   "11-12": {
-    phase: "MAÎTRISE",
-    objectif: "Automatisation — sans effort conscient",
-    duree: "15–20 min / jour",
-    tasks: [
-      {
-        id:"cc_matin", slot:"bureau",
-        title:"Cohérence cardiaque — Matin",
-        desc:"5 min. Complètement automatique.",
-        time:"10h30", tags:["b"], dur:5
-      },
-      {
-        id:"kegel_leger", slot:"bureau",
-        title:"Kegel léger — 3 à 4× par semaine",
-        desc:"Maintenance légère. 10 min max. Kegel lent + Reverse Kegel. Pas tous les jours : le muscle est renforcé, la fréquence baisse. Éviter la régression uniquement.",
-        time:"11h00", tags:["k"], dur:10
-      },
-      {
-        id:"sport", slot:"soir",
-        title:"Sport (3× / semaine)",
-        desc:"30 min. Condition physique générale maintenue.",
-        time:"19h00", tags:["s"], dur:30
-      },
-      {
-        id:"pratique_nat", slot:"nuit",
-        title:"Pratique naturelle — Sans protocole",
-        desc:"Pratique libre sans protocole rigide. Les techniques Stop & Start, Squeeze, Reverse Kegel, respiration inversée sont automatisées. Célébrer les progrès — comparer avec la semaine 1.",
-        time:"21h00", tags:["t"], dur:15
-      },
-      {
-        id:"resp_nat", slot:"nuit",
-        title:"Respiration naturelle et consciente",
-        desc:"Quelques cycles 4-7-8 ou cohérence cardiaque selon l'envie. Intégrée sans effort.",
-        time:"22h15", tags:["b"], dur:3
-      },
+    phase:"MAÎTRISE", objectif:"Automatisation complète — toutes les techniques devenues des réflexes", duree:"~60 min / jour",
+    tasks:[
+      {id:"eau_matin",  title:"💧 Eau — Réveil",                         desc:"Boire 500ml d'eau dès le réveil, avant tout.",                                                                                                                                                                                      time:"07h00", tags:["e"], dur:1},
+      {id:"eau_10h",    title:"💧 Eau — 10h",                            desc:"Boire 250ml. Bouteille sur le bureau, visible.",                                                                                                                                                                                    time:"10h00", tags:["e"], dur:1},
+      {id:"cc_matin",   title:"🫁 Cohérence cardiaque — Matin",          desc:"Inspirer 5 sec par le nez → expirer 5 sec par la bouche. Répéter pendant 5 min assis à ton bureau.",                                                                                                                               time:"10h30", tags:["b"], dur:5},
+      {id:"k_leger",    title:"💪 Kegel — 3 à 4 fois par semaine",       desc:"Kegel lent (5 reps × 15 sec) + Reverse Kegel (10 reps × 5 sec). 10 min. Pas tous les jours — le muscle est bien renforcé. Maintenir pour éviter toute régression.",                                                               time:"11h00", tags:["k"], dur:10},
+      {id:"eau_13h",    title:"💧 Eau — 13h",                            desc:"Boire 250ml.",                                                                                                                                                                                                                      time:"13h00", tags:["e"], dur:1},
+      {id:"cc_midi",    title:"🫁 Cohérence cardiaque — Midi",           desc:"Inspirer 5 sec par le nez → expirer 5 sec par la bouche. Répéter pendant 5 min.",                                                                                                                                                  time:"13h30", tags:["b"], dur:5},
+      {id:"eau_16h",    title:"💧 Eau — 16h",                            desc:"Boire 250ml.",                                                                                                                                                                                                                      time:"16h00", tags:["e"], dur:1},
+      {id:"sport",      title:"🚴 Vélo 35 min + Programme haut du corps complet", desc:"Vélo 35 min. Enchaîner : 3×18 pompes + 3×12 dips sur chaise + 3×8 tractions + 3×55 sec gainage ventral + 3×10 superman allongé (dos et fessiers). Respiration abdominale. 3 fois cette semaine.",                        time:"19h00", tags:["s"], dur:60},
+      {id:"etirements",  title:"🧘 Étirements — Après sport",               desc:"APRÈS le sport uniquement, jamais avant à froid. Enchaîner : ischio-jambiers debout (30 sec chaque jambe) + quadriceps debout (30 sec chaque jambe) + hanches au sol (30 sec chaque côté) + pectoraux contre un mur (30 sec) + dos en boule au sol (30 sec). Total 5-8 min.", time:"19h45", tags:["s"], dur:8},
+      {id:"cc_soir",    title:"🫁 Cohérence cardiaque — Soir",           desc:"Inspirer 5 sec par le nez → expirer 5 sec par la bouche. Répéter pendant 5 min.",                                                                                                                                                  time:"19h30", tags:["b"], dur:5},
+      {id:"resp_478_av",title:"🫁 Respiration 4-7-8 — Avant séance",     desc:"Inspirer 4 sec → retenir 7 sec → expirer lentement 8 sec. Répéter 4 cycles avant la séance.",                                                                                                                                      time:"20h50", tags:["b"], dur:3},
+      {id:"pratique",   title:"🌊 Pratique naturelle — Techniques en réflexe", desc:"Stop & Start (7-8/10 → stop → 4/10), Squeeze sur le frein (10-15 sec à 8/10), Reverse Kegel au moment critique (pousser vers l'extérieur 5 sec), respiration inversée (inspirer 2 sec → retenir 2 sec → expirer 10 sec). Toutes les techniques sont des réflexes. Jambes relâchées.", time:"21h00", tags:["t"], dur:15},
+      {id:"resp_478",   title:"🫁 Respiration 4-7-8 — Avant sommeil",    desc:"Inspirer 4 sec → retenir 7 sec → expirer lentement 8 sec. Répéter 4 cycles.",                                                                                                                                                      time:"22h15", tags:["b"], dur:3},
+      {id:"sommeil",    title:"🌙 Coucher avant 23h",                    desc:"Chambre fraîche (18-20°C), obscurité totale, écrans éteints. Priorité absolue.",                                                                                                                                                    time:"22h30", tags:["v"], dur:0},
     ]
-  }
+  },
+
 };
 
 // ═══════════════════════════════════════════════════════════════
+// PROGRAMME MAINTENANCE (semaine 13+) — généré dynamiquement
+// Programme lit : FIXE (identique sem 11-12)
+// Sport : progression infinie toutes les 2 semaines
+// Eau : fixe (1.5L/jour maintenu)
+// ═══════════════════════════════════════════════════════════════
+function getMaintProgram(week) {
+  // Progression toutes les 4 semaines, plafond semaine 45
+  const cappedWeek = Math.min(week, 45);
+  const extra      = Math.floor((cappedWeek - 13) / 4);
+  const atCap      = week >= 45;
+
+  const veloMin    = 35 + extra * 5;
+  const pompes     = 18 + extra;
+  const dips       = 12 + extra;
+  const tractions  = 8  + extra;
+  const gainage    = 55 + extra * 5;
+  const superman   = 10 + extra;
+  const totalSport = veloMin + 30; // +30 pour étirements inclus
+
+  const capNote = atCap ? " — NIVEAU MAXIMUM ATTEINT, maintien à vie" : "";
+
+  return {
+    phase:"MAINTENANCE",
+    objectif:`Maintien à vie — programme lit fixe, sport en progression (sem. ${week})${capNote}`,
+    duree:`~${totalSport + 20} min / jour`,
+    tasks:[
+      {id:"eau_matin",   title:"💧 Eau — Réveil",                          desc:"Boire 500ml d'eau dès le réveil, avant tout.",                                                                                                                                                                 time:"07h00", tags:["e"], dur:1},
+      {id:"eau_10h",     title:"💧 Eau — 10h",                              desc:"Boire 250ml. Bouteille sur le bureau, visible.",                                                                                                                                                               time:"10h00", tags:["e"], dur:1},
+      {id:"cc_matin",    title:"🫁 Cohérence cardiaque — Matin",            desc:"Inspirer 5 sec par le nez → expirer 5 sec par la bouche. Répéter pendant 5 min assis à ton bureau.",                                                                                                         time:"10h30", tags:["b"], dur:5},
+      {id:"k_maint",     title:"💪 Kegel — 2 à 3 fois par semaine",         desc:"Kegel lent (5 reps × 15 sec) + Reverse Kegel (10 reps × 5 sec). 10 min. Hygiène musculaire permanente, comme se brosser les dents.",                                                                        time:"11h00", tags:["k"], dur:10},
+      {id:"eau_13h",     title:"💧 Eau — 13h",                              desc:"Boire 250ml.",                                                                                                                                                                                               time:"13h00", tags:["e"], dur:1},
+      {id:"cc_midi",     title:"🫁 Cohérence cardiaque — Midi",             desc:"Inspirer 5 sec par le nez → expirer 5 sec par la bouche. Répéter pendant 5 min.",                                                                                                                            time:"13h30", tags:["b"], dur:5},
+      {id:"eau_16h",     title:"💧 Eau — 16h",                              desc:"Boire 250ml.",                                                                                                                                                                                               time:"16h00", tags:["e"], dur:1},
+      {id:"sport",       title:`🚴 Vélo ${veloMin} min + Haut du corps`,
+        desc:`Vélo ${veloMin} min. Enchaîner : 3×${pompes} pompes + 3×${dips} dips sur chaise + 3×${tractions} tractions + 3×${gainage} sec gainage ventral + 3×${superman} superman allongé. Respiration abdominale pendant tout l'effort. 3 fois cette semaine.`,
+        time:"19h00", tags:["s"], dur:veloMin + 20},
+      {id:"etirements",  title:"🧘 Étirements — Après sport",               desc:"APRÈS le sport uniquement, jamais avant à froid. Enchaîner : ischio-jambiers debout (30 sec chaque jambe) + quadriceps debout (30 sec chaque jambe) + hanches au sol (30 sec chaque côté) + pectoraux contre un mur (30 sec) + dos en boule au sol (30 sec). Total 5-8 min.",                                                                                                    time:"19h45", tags:["s"], dur:8},
+      {id:"cc_soir",     title:"🫁 Cohérence cardiaque — Soir",             desc:"Inspirer 5 sec par le nez → expirer 5 sec par la bouche. Répéter pendant 5 min.",                                                                                                                            time:"20h00", tags:["b"], dur:5},
+      {id:"resp_478_av", title:"🫁 Respiration 4-7-8 — Avant séance",       desc:"Inspirer 4 sec → retenir 7 sec → expirer lentement 8 sec. Répéter 4 cycles avant la séance.",                                                                                                               time:"20h50", tags:["b"], dur:3},
+      {id:"pratique",    title:"🌊 Pratique naturelle — Programme lit fixe", desc:"Stop & Start (7-8/10 → stop → 4/10), Squeeze sur le frein (10-15 sec à 8/10), Reverse Kegel au moment critique (pousser vers l'extérieur 5 sec), respiration inversée (inspirer 2 sec → retenir 2 sec → expirer 10 sec). Toutes les techniques sont des réflexes permanents. Jambes relâchées.",  time:"21h00", tags:["t"], dur:15},
+      {id:"resp_478",    title:"🫁 Respiration 4-7-8 — Avant sommeil",      desc:"Inspirer 4 sec → retenir 7 sec → expirer lentement 8 sec. Répéter 4 cycles.",                                                                                                                               time:"22h15", tags:["b"], dur:3},
+      {id:"sommeil",     title:"🌙 Coucher avant 23h",                      desc:"Chambre fraîche (18-20°C), obscurité totale, écrans éteints. Priorité absolue.",                                                                                                                             time:"22h30", tags:["v"], dur:0},
+    ]
+  };
+}
+
+
+// ═══════════════════════════════════════════════════════════════
 // HELPERS
+function getMaintProgram(week) {
+  // Sport : progression continue à partir de sem 13
+  // Toutes les 2 semaines on ajoute 5 min vélo et 1 rep aux exercices
+  const extra = Math.floor((week - 13) / 2);
+  const veloMin  = 35 + extra * 5;
+  const pompes   = 18 + extra;
+  const dips     = 12 + extra;
+  const tractions= 8 + extra;
+  const gainage  = 55 + extra * 5;
+  const superman = 10 + extra;
+
+  return {
+    phase:"MAINTENANCE",
+    objectif:`Maintien à vie — Programme lit fixe + sport en progression (sem. ${week})`,
+    duree:`~${60 + extra*5} min / jour`,
+    tasks:[
+      {id:"eau_matin", slot:"matin",  title:"💧 Eau — Réveil",           desc:"Boire 500ml d'eau dès le réveil, avant tout.",                                                                                                                        time:"07h00", tags:["e"], dur:1},
+      {id:"eau_10h",   slot:"bureau", title:"💧 Eau — 10h",               desc:"Boire 250ml. Bouteille sur le bureau visible.",                                                                                                                      time:"10h00", tags:["e"], dur:1},
+      {id:"eau_midi",  slot:"pause",  title:"💧 Eau — 13h",               desc:"Boire 250ml.",                                                                                                                                                       time:"13h00", tags:["e"], dur:1},
+      {id:"eau_16h",   slot:"pause",  title:"💧 Eau — 16h",               desc:"Boire 250ml.",                                                                                                                                                       time:"16h00", tags:["e"], dur:1},
+      {id:"cc_matin",  slot:"bureau", title:"🫁 Cohérence cardiaque — Matin", desc:"Inspirer 5 sec par le nez → expirer 5 sec par la bouche. Répéter pendant 5 min assis à ton bureau.",                                                           time:"10h30", tags:["b"], dur:5},
+      {id:"cc_midi",   slot:"pause",  title:"🫁 Cohérence cardiaque — Midi",  desc:"Inspirer 5 sec par le nez → expirer 5 sec par la bouche. Répéter pendant 5 min.",                                                                             time:"13h30", tags:["b"], dur:5},
+      {id:"cc_soir",   slot:"soir",   title:"🫁 Cohérence cardiaque — Soir",  desc:"Inspirer 5 sec par le nez → expirer 5 sec par la bouche. Répéter pendant 5 min.",                                                                             time:"19h30", tags:["b"], dur:5},
+      {id:"k_maint",   slot:"bureau", title:"💪 Kegel — 2 à 3 fois par semaine", desc:"Kegel lent (5 reps × 15 sec) + Reverse Kegel (10 reps × 5 sec). 10 min. Hygiène musculaire permanente comme se brosser les dents.",                       time:"11h00", tags:["k"], dur:10},
+      {id:"sport",     slot:"soir",   title:`🚴 Vélo ${veloMin} min + Pompes + Dips + Tractions + Gainage + Superman`,
+        desc:`Vélo ${veloMin} min. Enchaîner : 3×${pompes} pompes + 3×${dips} dips sur chaise + 3×${tractions} tractions + 3×${gainage} sec gainage + 3×${superman} superman allongé. Respiration abdominale. 3 fois cette semaine.`,
+        time:"19h00", tags:["s"], dur: veloMin + 25},
+      {id:"pratique",  slot:"nuit",   title:"🌊 Pratique naturelle — Programme lit fixe", desc:"Stop & Start, Squeeze sur le frein (10-15 sec à 8/10), Reverse Kegel au moment critique, respiration inversée (inspirer 2 sec → expirer 10 sec). Toutes les techniques sont des réflexes permanents. Jambes relâchées.", time:"21h00", tags:["t"], dur:15},
+      {id:"resp_478",  slot:"nuit",   title:"🫁 Respiration 4-7-8 — Avant sommeil", desc:"Inspirer 4 sec → retenir 7 sec → expirer lentement 8 sec. Répéter 4 cycles.",                                                                           time:"22h15", tags:["b"], dur:3},
+      {id:"sommeil",   slot:"nuit",   title:"🌙 Coucher avant 23h",       desc:"Chambre fraîche (18-20°C), obscurité totale, écrans éteints. Priorité absolue.",                                                                                    time:"22h30", tags:["v"], dur:0},
+    ]
+  };
+}
+
+// ═══════════════════════════════════════════════════════════════
+// HELPERS
+
+
 // ═══════════════════════════════════════════════════════════════
 const PHASES_LIST = [null,"1-2","1-2","3-4","3-4","5-6","5-6","7-8","7-8","9-10","9-10","11-12","11-12"];
-const PHASE_LABELS = {"1-2":"Fondation","3-4":"Renforcement","5-6":"Contrôle","7-8":"Intégration","9-10":"Consolidation","11-12":"Maîtrise"};
+const PHASE_LABELS = {"1-2":"Fondation","3-4":"Renforcement","5-6":"Contrôle","7-8":"Intégration","9-10":"Consolidation","11-12":"Maîtrise","13+":"Maintenance"};
 
 const SK = 'p4_state', WK = 'p4_week', STK = 'p4_streak', TK = 'p4_today';
 
@@ -649,9 +482,13 @@ function saveState(s){ localStorage.setItem(SK,JSON.stringify(s)); }
 function loadWeek(){ return parseInt(localStorage.getItem(WK))||1; }
 function saveWeek(w){ localStorage.setItem(WK,w); }
 function loadStreak(){ return parseInt(localStorage.getItem(STK))||0; }
-function getKey(w){ return PHASES_LIST[w]; }
+function getKey(w){
+  if(w >= 13) return "13+";
+  return PHASES_LIST[w];
+}
 
 function getProgram(w){
+  if(w >= 13) return getMaintProgram(w);
   const key = getKey(w);
   return PROGRAM[key];
 }
@@ -690,19 +527,25 @@ function render(){
   const list = document.getElementById('taskList');
   list.innerHTML = '';
 
-  const slots = [
-    {id:"bureau", label:"🏢 Au bureau (matin)"},
-    {id:"pause",  label:"☀️ Pause / Journée"},
-    {id:"soir",   label:"🌆 Soir"},
-    {id:"nuit",   label:"🌙 Nuit"},
+  // Trier toutes les tâches par heure chronologique
+  function timeToMin(t){ const [h,m]=(t||'00h00').split('h').map(Number); return h*60+(m||0); }
+  const sorted = [...prog.tasks].sort((a,b)=>timeToMin(a.time)-timeToMin(b.time));
+
+  // Grouper par tranches horaires avec label
+  const sections = [
+    {label:"🌅 Matin — Avant le taff",    from:0,    to:9*60},
+    {label:"🏢 Au bureau — Matin",         from:9*60, to:13*60},
+    {label:"☀️ Pause — Après-midi",        from:13*60,to:18*60},
+    {label:"🌆 Soir",                      from:18*60,to:21*60},
+    {label:"🌙 Nuit",                      from:21*60,to:24*60},
   ];
 
-  slots.forEach(slot => {
-    const tasks = prog.tasks.filter(t => t.slot === slot.id);
+  sections.forEach(sec => {
+    const tasks = sorted.filter(t => timeToMin(t.time) >= sec.from && timeToMin(t.time) < sec.to);
     if(!tasks.length) return;
     const lbl = document.createElement('div');
     lbl.className = 'sec-lbl';
-    lbl.textContent = slot.label;
+    lbl.textContent = sec.label;
     list.appendChild(lbl);
     tasks.forEach(t => list.appendChild(makeTask(t, !!state[t.id])));
   });
@@ -710,14 +553,17 @@ function render(){
   updateProgress(prog, state);
 }
 
-function tagLabel(t){ return{k:"Kegel",b:"Respiration",m:"Mindfulness",t:"Technique",s:"Sport"}[t]||t; }
+function tagLabel(t){ return{k:"Kegel",b:"Respiration",m:"Mindfulness",t:"Technique",s:"Sport",e:"Hydratation",a:"Alimentation",v:"Sommeil"}[t]||t; }
 
 function makeTask(task, done){
   const el = document.createElement('div');
   el.className = 'task'+(done?' done':'');
   el.dataset.id = task.id;
   const tags = task.tags.map(t=>`<span class="tag ${t}">${tagLabel(t)}</span>`).join('')
-             + `<span class="tag d">⏱ ${task.dur} min</span>`;
+             + (task.dur > 0 ? `<span class="tag d">⏱ ${task.dur} min</span>` : '');
+  const chronoBtn = task.dur > 0
+    ? `<div class="t-chrono-btn" onclick="event.stopPropagation();openChrono('${task.title.replace(/'/g,"\\'")}', ${task.dur})">⏱ Lancer le chrono — ${task.dur} min</div>`
+    : '';
   el.innerHTML = `
     <div class="chk"><span class="chk-ico">✓</span></div>
     <div class="t-body">
@@ -727,7 +573,7 @@ function makeTask(task, done){
       </div>
       <div class="t-desc">${task.desc}</div>
       <div class="t-tags">${tags}</div>
-      <div class="t-chrono-btn" onclick="event.stopPropagation();openChrono('${task.title}', ${task.dur})">⏱ Lancer le chrono — ${task.dur} min</div>
+      ${chronoBtn}
     </div>`;
   el.onclick = () => toggle(el, task.id);
   return el;
@@ -787,11 +633,13 @@ function openModal(){
   const cur = loadWeek();
   const grid = document.getElementById('wgrid');
   grid.innerHTML='';
-  for(let w=1;w<=12;w++){
+  const maxW = Math.max(cur + 4, 16);
+  for(let w=1;w<=maxW;w++){
     const key = getKey(w);
+    const lbl = PHASE_LABELS[key] || 'Maintenance';
     const btn = document.createElement('div');
     btn.className='wbtn'+(w===cur?' active':'');
-    btn.innerHTML=`<div class="wbn">S${w}</div><div class="wbp">${PHASE_LABELS[key]}</div>`;
+    btn.innerHTML=`<div class="wbn">S${w}</div><div class="wbp">${lbl}</div>`;
     btn.onclick=()=>{ saveWeek(w); saveState({}); render(); closeModal(); };
     grid.appendChild(btn);
   }
