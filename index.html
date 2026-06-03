@@ -1,0 +1,778 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<title>Mon Programme</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600;700&family=DM+Mono:wght@400;500&display=swap');
+  :root {
+    --bg:#0a0e1a; --surface:#111827; --surface2:#1a2235;
+    --border:rgba(255,255,255,0.07); --accent:#4f8ef7; --accent2:#7c3aed;
+    --green:#22c55e; --text:#f1f5f9; --muted:#64748b; --r:18px;
+  }
+  *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
+  body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;padding-bottom:110px;overflow-x:hidden;}
+
+  /* HEADER */
+  .hdr{background:linear-gradient(135deg,#0f172a 0%,#1e1b4b 50%,#0f172a 100%);padding:52px 20px 22px;position:relative;overflow:hidden;}
+  .hdr::before{content:'';position:absolute;top:-60px;right:-60px;width:200px;height:200px;background:radial-gradient(circle,rgba(79,142,247,0.15) 0%,transparent 70%);border-radius:50%;}
+  .hdr-top{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:12px;position:relative;z-index:1;}
+  .day-lbl{font-size:12px;color:var(--accent);font-weight:700;letter-spacing:.12em;text-transform:uppercase;}
+  .date-lbl{font-size:20px;font-weight:700;margin-top:3px;}
+  .wk-badge{background:linear-gradient(135deg,var(--accent),var(--accent2));border-radius:12px;padding:8px 14px;text-align:center;cursor:pointer;}
+  .wk-num{font-size:19px;font-weight:700;line-height:1;}
+  .wk-lbl{font-size:10px;opacity:.8;font-weight:500;}
+  .pills{display:flex;align-items:center;gap:8px;position:relative;z-index:1;margin-bottom:14px;}
+  .pill-streak{background:rgba(249,115,22,0.15);border:1px solid rgba(249,115,22,0.3);border-radius:99px;padding:4px 12px;font-size:12px;font-weight:700;color:#fb923c;}
+  .pill-phase{background:rgba(79,142,247,0.12);border:1px solid rgba(79,142,247,0.2);border-radius:99px;padding:4px 12px;font-size:12px;font-weight:600;color:#93c5fd;}
+  .prog-wrap{position:relative;z-index:1;}
+  .prog-info{display:flex;justify-content:space-between;margin-bottom:8px;font-size:12px;color:var(--muted);font-weight:500;}
+  .prog-info span:last-child{color:var(--green);font-weight:700;}
+  .prog-bar{height:6px;background:rgba(255,255,255,0.08);border-radius:99px;overflow:hidden;}
+  .prog-fill{height:100%;background:linear-gradient(90deg,var(--accent),var(--green));border-radius:99px;transition:width .6s cubic-bezier(.4,0,.2,1);width:0%;}
+
+  /* TABS */
+  .tabs{display:flex;padding:14px 20px 0;gap:8px;overflow-x:auto;scrollbar-width:none;background:var(--bg);position:sticky;top:0;z-index:10;-webkit-overflow-scrolling:touch;}
+  .tabs::-webkit-scrollbar{display:none;}
+  .tab{flex-shrink:0;padding:8px 16px;border-radius:99px;font-size:13px;font-weight:600;border:1.5px solid var(--border);background:var(--surface);color:var(--muted);cursor:pointer;transition:all .2s;}
+  .tab.active{background:var(--accent);border-color:var(--accent);color:white;}
+
+  /* CONTENT */
+  .content{padding:14px 20px;}
+  .sec-lbl{font-size:11px;font-weight:700;letter-spacing:.15em;text-transform:uppercase;color:var(--muted);margin:18px 0 10px;display:flex;align-items:center;gap:8px;}
+  .sec-lbl::after{content:'';flex:1;height:1px;background:var(--border);}
+
+  /* BANNER */
+  .banner{background:linear-gradient(135deg,rgba(79,142,247,0.1),rgba(124,58,237,0.08));border:1.5px solid rgba(79,142,247,0.18);border-radius:var(--r);padding:14px 16px;margin-bottom:6px;}
+  .banner-title{font-size:14px;font-weight:700;margin-bottom:4px;}
+  .banner-sub{font-size:11px;color:var(--muted);margin-bottom:2px;}
+  .banner-desc{font-size:12px;color:var(--muted);line-height:1.5;}
+
+  /* TASK */
+  .task{background:var(--surface);border:1.5px solid var(--border);border-radius:var(--r);padding:15px;margin-bottom:10px;display:flex;align-items:flex-start;gap:13px;cursor:pointer;transition:all .25s cubic-bezier(.4,0,.2,1);position:relative;overflow:hidden;-webkit-user-select:none;user-select:none;}
+  .task::before{content:'';position:absolute;left:0;top:0;bottom:0;width:3px;border-radius:0 3px 3px 0;background:var(--accent);transition:background .3s;}
+  .task.done{background:rgba(34,197,94,0.06);border-color:rgba(34,197,94,0.2);}
+  .task.done::before{background:var(--green);}
+  .task.done .t-title{text-decoration:line-through;opacity:.45;}
+  .task.done .t-desc{opacity:.3;}
+  .chk{width:26px;height:26px;border-radius:50%;border:2px solid var(--muted);flex-shrink:0;display:flex;align-items:center;justify-content:center;transition:all .25s;background:transparent;margin-top:1px;}
+  .task.done .chk{background:var(--green);border-color:var(--green);}
+  .chk-ico{opacity:0;transform:scale(.5);transition:all .2s cubic-bezier(.34,1.56,.64,1);color:white;font-size:13px;}
+  .task.done .chk-ico{opacity:1;transform:scale(1);}
+  .t-body{flex:1;min-width:0;}
+  .t-head{display:flex;justify-content:space-between;align-items:flex-start;gap:8px;margin-bottom:4px;}
+  .t-title{font-size:15px;font-weight:600;color:var(--text);line-height:1.3;transition:all .3s;}
+  .t-time{font-family:'DM Mono',monospace;font-size:11px;color:var(--accent);font-weight:500;background:rgba(79,142,247,0.1);padding:3px 8px;border-radius:6px;white-space:nowrap;flex-shrink:0;}
+  .t-desc{font-size:12px;color:var(--muted);line-height:1.5;margin-top:2px;transition:all .3s;}
+  .t-tags{display:flex;gap:6px;flex-wrap:wrap;margin-top:8px;}
+  .tag{font-size:10px;font-weight:600;padding:3px 8px;border-radius:6px;letter-spacing:.05em;}
+  .tag.k{background:rgba(124,58,237,0.15);color:#a78bfa;}
+  .tag.b{background:rgba(6,182,212,0.15);color:#22d3ee;}
+  .tag.m{background:rgba(249,115,22,0.15);color:#fb923c;}
+  .tag.t{background:rgba(79,142,247,0.15);color:#93c5fd;}
+  .tag.s{background:rgba(34,197,94,0.15);color:#4ade80;}
+  .tag.d{background:rgba(255,255,255,0.07);color:var(--muted);}
+
+  /* ANIM */
+  @keyframes bi{0%{transform:scale(1)}30%{transform:scale(.96)}60%{transform:scale(1.02)}100%{transform:scale(1)}}
+  .task.jd{animation:bi .3s ease;}
+  @keyframes pd{0%{transform:scale(0) translate(0,0);opacity:1}100%{transform:scale(1) translate(var(--tx),var(--ty));opacity:0}}
+  .pdot{position:fixed;width:8px;height:8px;border-radius:50%;pointer-events:none;z-index:9999;animation:pd .6s ease-out forwards;}
+
+  /* BOTTOM */
+  .bot{position:fixed;bottom:0;left:0;right:0;background:rgba(17,24,39,0.96);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);border-top:1px solid var(--border);padding:12px 20px calc(12px + env(safe-area-inset-bottom));display:flex;justify-content:space-between;align-items:center;z-index:20;}
+  .bs{text-align:center;}
+  .bn{font-size:20px;font-weight:700;color:var(--accent);line-height:1;}
+  .bl{font-size:10px;color:var(--muted);font-weight:500;margin-top:2px;}
+  .rbtn{background:rgba(239,68,68,0.12);border:1.5px solid rgba(239,68,68,0.25);color:#ef4444;font-family:'DM Sans',sans-serif;font-size:13px;font-weight:600;padding:10px 18px;border-radius:12px;cursor:pointer;transition:all .2s;}
+  .rbtn:active{transform:scale(.95);}
+
+  /* TIP / DANGER */
+  .tip{background:linear-gradient(135deg,rgba(79,142,247,0.08),rgba(124,58,237,0.06));border:1.5px solid rgba(79,142,247,0.15);border-radius:var(--r);padding:16px;margin-bottom:10px;}
+  .tip-ico{font-size:22px;margin-bottom:8px;}
+  .tip-t{font-size:14px;font-weight:700;margin-bottom:4px;}
+  .tip-b{font-size:12px;color:var(--muted);line-height:1.6;}
+  .dng{background:rgba(239,68,68,0.06);border:1.5px solid rgba(239,68,68,0.15);border-radius:var(--r);padding:16px;margin-bottom:10px;}
+  .dng-t{font-size:13px;font-weight:700;color:#f87171;margin-bottom:4px;}
+  .dng-b{font-size:12px;color:var(--muted);line-height:1.6;}
+
+  /* MODAL */
+  .overlay{position:fixed;inset:0;background:rgba(0,0,0,0.7);z-index:100;display:flex;align-items:flex-end;justify-content:center;opacity:0;pointer-events:none;transition:opacity .25s;}
+  .overlay.open{opacity:1;pointer-events:all;}
+  .modal{background:var(--surface);border-radius:24px 24px 0 0;padding:24px 20px calc(24px + env(safe-area-inset-bottom));width:100%;max-width:500px;transform:translateY(30px);transition:transform .3s cubic-bezier(.4,0,.2,1);}
+  .overlay.open .modal{transform:translateY(0);}
+  .modal-t{font-size:16px;font-weight:700;margin-bottom:16px;text-align:center;}
+  .wgrid{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;}
+  .wbtn{background:var(--surface2);border:1.5px solid var(--border);border-radius:12px;padding:12px 8px;text-align:center;cursor:pointer;transition:all .2s;}
+  .wbtn.active{background:var(--accent);border-color:var(--accent);}
+  .wbn{font-size:16px;font-weight:700;}
+  .wbp{font-size:9px;color:var(--muted);margin-top:2px;font-weight:500;}
+  .wbtn.active .wbp{color:rgba(255,255,255,0.7);}
+</style>
+</head>
+<body>
+
+<div class="hdr">
+  <div class="hdr-top">
+    <div><div class="day-lbl" id="dayLbl"></div><div class="date-lbl" id="dateLbl"></div></div>
+    <div class="wk-badge" onclick="openModal()"><div class="wk-num">S<span id="wkNum">1</span></div><div class="wk-lbl">📅 Semaine</div></div>
+  </div>
+  <div class="pills">
+    <div class="pill-streak">🔥 <span id="streak">0</span> jours</div>
+    <div class="pill-phase" id="phase">Fondation</div>
+  </div>
+  <div class="prog-wrap">
+    <div class="prog-info"><span id="progTxt">0 / 0 tâches</span><span id="progPct">0%</span></div>
+    <div class="prog-bar"><div class="prog-fill" id="progFill"></div></div>
+  </div>
+</div>
+
+<div class="tabs">
+  <div class="tab active" data-tab="today">Aujourd'hui</div>
+  <div class="tab" data-tab="tips">Conseils</div>
+  <div class="tab" data-tab="donts">⛔ À éviter</div>
+</div>
+
+<div class="content" id="tab-today">
+  <div class="banner" style="margin-top:4px">
+    <div class="banner-title" id="bTitle"></div>
+    <div class="banner-sub" id="bSub"></div>
+    <div class="banner-desc" id="bDesc"></div>
+  </div>
+  <div id="taskList"></div>
+  <div style="height:16px"></div>
+</div>
+
+<div class="content" id="tab-tips" style="display:none">
+  <div class="tip"><div class="tip-ico">💪</div><div class="tip-t">Muscle PC — base de tout</div><div class="tip-b">Le muscle pubococcygien se renforce comme n'importe quel muscle. 6 à 12 semaines suffisent pour voir une vraie différence. Consistance > intensité. Ne jamais sur-entraîner : 2 séances max par jour.</div></div>
+  <div class="tip"><div class="tip-ico">🫁</div><div class="tip-t">La respiration : ton outil le plus puissant</div><div class="tip-b">Le SNA est directement contrôlable via la respiration. Cohérence cardiaque (5-5) 3× par jour dès la semaine 1. Expiration longue (8-10 sec) quand l'excitation monte. Respiration inversée au moment critique (sem. 7+).</div></div>
+  <div class="tip"><div class="tip-ico">🎯</div><div class="tip-t">Stop &amp; Start : stopper à 7/10 jamais à 9/10</div><div class="tip-b">À 9/10 le réflexe est enclenché — trop tard. L'objectif est d'apprendre à reconnaître 7/10 et revenir volontairement à 4/10. Technique validée cliniquement (Masters &amp; Johnson, 1970).</div></div>
+  <div class="tip"><div class="tip-ico">✊</div><div class="tip-t">Technique Squeeze (Semans, 1956)</div><div class="tip-b">À 8/10 : squeeze ferme sur le frein pendant 10–15 sec → attendre la baisse → reprendre. Éprouvée cliniquement depuis 70 ans. Introduite en semaine 5-6 une fois le Stop &amp; Start maîtrisé.</div></div>
+  <div class="tip"><div class="tip-ico">🌊</div><div class="tip-t">Edging — entraîner la tolérance au plateau</div><div class="tip-b">Rester au niveau 7–8/10 le plus longtemps possible sans franchir le seuil. Entraîne le système nerveux à tolérer l'excitation haute. 15 min en sem. 5-6, 20-30 min en sem. 7-8.</div></div>
+  <div class="tip"><div class="tip-ico">🔄</div><div class="tip-t">Reverse Kegel — aussi important que le Kegel</div><div class="tip-b">Pousser doucement vers l'extérieur (inverse du Kegel) → maintenir 5 sec. Technique anti-réflexe directe. Introduite en sem. 5-6, doit être automatique dès sem. 7.</div></div>
+  <div class="tip"><div class="tip-ico">🧘</div><div class="tip-t">Mindful Masturbation — rester présent</div><div class="tip-b">Observer les sensations sans jugement, ralentir à volonté, scanner le corps. Penser à autre chose = zéro progrès. La présence dans les sensations est la compétence à développer. (Sex Therapy — Mindfulness-based)</div></div>
+  <div class="tip"><div class="tip-ico">📈</div><div class="tip-t">Programme exact — 12 semaines</div><div class="tip-b">Sem 1–2 : Fondation (Kegel base + cohérence cardiaque + Stop &amp; Start 5 min). Sem 3–4 : Renforcement (Kegel lent/rapide + Stop &amp; Start 10 min + 4-7-8). Sem 5–6 : Contrôle (Escalier + Reverse + Squeeze + Edging 15 min). Sem 7–8 : Intégration (Tout ensemble + Edging 20 min + resp. inversée). Sem 9–10 : Consolidation. Sem 11–12 : Maîtrise.</div></div>
+</div>
+
+<div class="content" id="tab-donts" style="display:none">
+  <div class="dng"><div class="dng-t">🫁 Bloquer / couper sa respiration</div><div class="dng-b">Augmente la pression abdominale et amplifie directement le réflexe. Toujours expirer lentement, surtout au moment critique. Erreur la plus fréquente et la plus grave.</div></div>
+  <div class="dng"><div class="dng-t">⚡ Hyperventiler (respiration rapide)</div><div class="dng-b">Active brutalement le sympathique. Crée un état de sur-excitation incontrôlable. Seule la respiration lente et abdominale est correcte.</div></div>
+  <div class="dng"><div class="dng-t">🧠 Se focaliser sur la performance</div><div class="dng-b">L'anxiété de performance active le sympathique et sabote tout contrôle. Se concentrer uniquement sur les sensations du moment présent.</div></div>
+  <div class="dng"><div class="dng-t">💭 Penser à autre chose pour se distraire</div><div class="dng-b">Inefficace et contre-productif. Ne développe aucune compétence réelle. Il faut rester pleinement présent dans les sensations.</div></div>
+  <div class="dng"><div class="dng-t">🏋️ Sur-entraîner le Kegel</div><div class="dng-b">Fatigue musculaire excessive = douleurs pelviennes et régression. Maximum 2 séances de Kegel par jour, avec récupération.</div></div>
+  <div class="dng"><div class="dng-t">⚡ Masturbation rapide sans protocole</div><div class="dng-b">Conditionne le SN à réagir vite — effet inverse. Toute pratique solo doit être lente, consciente, avec les techniques du programme.</div></div>
+  <div class="dng"><div class="dng-t">📱 Pornographie excessive</div><div class="dng-b">Désensibilise le circuit dopaminergique, abaisse les seuils naturels. Réduction drastique fortement recommandée.</div></div>
+  <div class="dng"><div class="dng-t">🍺 Alcool avant une séance</div><div class="dng-b">Perturbe la coordination neuromusculaire et fausse le biofeedback sensoriel. Aucun apprentissage possible sous alcool.</div></div>
+  <div class="dng"><div class="dng-t">😤 Se culpabiliser après un échec</div><div class="dng-b">Le stress post-échec conditionne négativement le SN pour les prochaines fois. Observer, noter, continuer. Les progrès sont non-linéaires.</div></div>
+  <div class="dng"><div class="dng-t">⏰ Attendre des résultats en 1–2 semaines</div><div class="dng-b">Le recâblage neuromusculaire prend 6 à 12 semaines minimum. Se comparer uniquement à soi-même, semaine après semaine.</div></div>
+  <div class="dng"><div class="dng-t">🔢 Commencer Stop &amp; Start trop haut (9/10)</div><div class="dng-b">À 9/10 le réflexe est déjà déclenché. Commencer à 6–7/10 maximum et descendre à 4/10 avant de reprendre.</div></div>
+  <div class="dng"><div class="dng-t">⚖️ Négliger le Reverse Kegel</div><div class="dng-b">Se concentrer uniquement sur la contraction crée un déséquilibre. Le relâchement actif est aussi important — à introduire dès la semaine 5.</div></div>
+</div>
+
+<div class="bot">
+  <div class="bs"><div class="bn" id="doneN">0</div><div class="bl">Faites</div></div>
+  <div class="bs"><div class="bn" id="totalN">—</div><div class="bl">Total</div></div>
+  <div class="bs"><div class="bn" id="minLeft">—</div><div class="bl">min restantes</div></div>
+  <button class="rbtn" onclick="resetDay()">Réinit.</button>
+</div>
+
+<div class="overlay" id="wkOverlay" onclick="closeModalOut(event)">
+  <div class="modal">
+    <div class="modal-t">Choisir ta semaine</div>
+    <div class="wgrid" id="wgrid"></div>
+  </div>
+</div>
+
+<script>
+// ═══════════════════════════════════════════════════════════════
+// DONNÉES — calquées exactement sur l'Excel mieux_dormir.xlsx
+// ═══════════════════════════════════════════════════════════════
+
+const PROGRAM = {
+
+  // ── SEMAINES 1-2 : FONDATION ────────────────────────────────
+  // Kegel : Kegel de base × 2/jour
+  // Technique : Stop & Start solo (5 min de plateau)
+  // Respiration : Cohérence cardiaque 3×/jour
+  // Durée : 20-25 min
+  "1-2": {
+    phase: "FONDATION",
+    objectif: "Renforcement de base + conscience corporelle",
+    duree: "20–25 min / jour",
+    tasks: [
+      {
+        id:"cc_matin", slot:"bureau",
+        title:"Cohérence cardiaque — Matin",
+        desc:"Inspirer 5 sec par le nez → expirer 5 sec par la bouche. 5 min assis à ton bureau. 3× par jour obligatoire cette semaine.",
+        time:"10h30", tags:["b"], dur:5
+      },
+      {
+        id:"kegel_base_1", slot:"bureau",
+        title:"Kegel de base — Contraction lente (Série 1)",
+        desc:"Contracter le muscle PC comme pour retenir l'urine → tenir 10 sec → relâcher lentement 10 sec. 10 répétitions. Assis, personne ne voit rien.",
+        time:"10h45", tags:["k"], dur:5
+      },
+      {
+        id:"cc_midi", slot:"pause",
+        title:"Cohérence cardiaque — Pause déj",
+        desc:"5 sec inspirer / 5 sec expirer. 5 min. Idéalement debout ou en marchant dehors.",
+        time:"13h00", tags:["b"], dur:5
+      },
+      {
+        id:"kegel_base_2", slot:"pause",
+        title:"Kegel de base — Contraction lente (Série 2)",
+        desc:"2e série de la journée : contracter 10 sec → relâcher 10 sec. 10 reps. Quotidien, 2× par jour comme indiqué dans l'Excel.",
+        time:"14h00", tags:["k"], dur:5
+      },
+      {
+        id:"sport", slot:"soir",
+        title:"Cardio léger (3× / semaine)",
+        desc:"30 min de marche rapide, vélo ou natation. Respiration abdominale consciente : gonfler le ventre, pas la poitrine.",
+        time:"19h00", tags:["s"], dur:30
+      },
+      {
+        id:"cc_soir", slot:"soir",
+        title:"Cohérence cardiaque — Soir",
+        desc:"3e séance de cohérence cardiaque. 5 min en rentrant. Finalise les 3×/jour obligatoires cette semaine.",
+        time:"19h30", tags:["b"], dur:5
+      },
+      {
+        id:"stop_start", slot:"nuit",
+        title:"Stop & Start — Solo (5 min de plateau)",
+        desc:"Monter à 7–8/10 d'excitation → stopper TOUTE stimulation → redescendre à 4/10 → recommencer. Objectif sem. 1-2 : tenir 5 min de plateau au total. (Masters & Johnson, 1970)",
+        time:"21h00", tags:["t"], dur:20
+      },
+      {
+        id:"kegel_nuit", slot:"nuit",
+        title:"Kegel de nuit — Isométrique léger",
+        desc:"20 contractions très douces allongé avant de dormir, sans tension. Coordonner avec la respiration. Conscience corporelle pure.",
+        time:"22h00", tags:["k"], dur:5
+      },
+      {
+        id:"resp_478", slot:"nuit",
+        title:"Respiration 4-7-8 — Avant sommeil",
+        desc:"Inspirer 4 sec → retenir 7 sec → expirer lentement 8 sec. 4 cycles minimum. Active le parasympathique, prépare au sommeil.",
+        time:"22h15", tags:["b"], dur:3
+      },
+    ]
+  },
+
+  // ── SEMAINES 3-4 : RENFORCEMENT ─────────────────────────────
+  // Kegel : Kegel lent + rapide × 2/jour
+  // Technique : Stop & Start (10 min) + mindful scan
+  // Respiration : 4-7-8 avant séances
+  // Durée : 25-30 min
+  "3-4": {
+    phase: "RENFORCEMENT",
+    objectif: "Augmenter endurance du PC + durée de plateau",
+    duree: "25–30 min / jour",
+    tasks: [
+      {
+        id:"cc_matin", slot:"bureau",
+        title:"Cohérence cardiaque — Matin",
+        desc:"5 sec / 5 sec pendant 5 min. Maintenir l'habitude des 3×/jour. Base de régulation du SNA.",
+        time:"10h30", tags:["b"], dur:5
+      },
+      {
+        id:"kegel_lent", slot:"bureau",
+        title:"Kegel de maintien progressif — Lent",
+        desc:"Augmenter progressivement la durée : 5s → 10s → 15s → 20s de contraction. 5 répétitions à chaque palier. Endurance musculaire du PC. (Niveau intermédiaire)",
+        time:"10h45", tags:["k"], dur:8
+      },
+      {
+        id:"kegel_rapide", slot:"bureau",
+        title:"Kegel rapide — Fast Kegel",
+        desc:"Contractions rapides et rythmées : 1 sec contracté / 1 sec relâché. 30 contractions × 3 séries. Réactivité neuromusculaire.",
+        time:"11h15", tags:["k"], dur:5
+      },
+      {
+        id:"cc_midi", slot:"pause",
+        title:"Cohérence cardiaque — Pause déj",
+        desc:"5 min. 2e séance de la journée.",
+        time:"13h00", tags:["b"], dur:5
+      },
+      {
+        id:"mindful_scan", slot:"pause",
+        title:"Balayage corporel — Mindful scan",
+        desc:"Scanner mentalement le corps des pieds à la tête. Observer les tensions pelviennes sans les juger. 5 min assis. (Mindfulness somatique — intégré au Stop & Start en séance).",
+        time:"15h00", tags:["m"], dur:5
+      },
+      {
+        id:"sport", slot:"soir",
+        title:"Cardio léger (3× / semaine)",
+        desc:"30 min. Respiration abdominale pendant tout l'effort.",
+        time:"19h00", tags:["s"], dur:30
+      },
+      {
+        id:"cc_soir", slot:"soir",
+        title:"Cohérence cardiaque — Soir",
+        desc:"5 min. 3e séance.",
+        time:"19h30", tags:["b"], dur:5
+      },
+      {
+        id:"resp_478_avant", slot:"nuit",
+        title:"Respiration 4-7-8 — Avant séance",
+        desc:"Inspirer 4 sec → retenir 7 sec → expirer 8 sec. 4 cycles avant de commencer le Stop & Start. Nouveau en sem. 3-4 : préparer le SNA avant la séance.",
+        time:"20h45", tags:["b"], dur:3
+      },
+      {
+        id:"stop_start_10", slot:"nuit",
+        title:"Stop & Start — Solo (10 min de plateau)",
+        desc:"Monter à 7–8/10 → stopper → redescendre à 4/10 → reprendre. Objectif sem. 3-4 : 10 min de plateau au total. Intégrer le balayage corporel pendant la séance.",
+        time:"21h00", tags:["t"], dur:25
+      },
+      {
+        id:"kegel_lent_2", slot:"nuit",
+        title:"Kegel lent — Série 2 (soirée)",
+        desc:"2e série du jour : maintien progressif 5s→10s→15s→20s. 5 reps à chaque palier. Quotidien × 2/jour comme indiqué dans l'Excel.",
+        time:"22h00", tags:["k"], dur:8
+      },
+      {
+        id:"resp_478", slot:"nuit",
+        title:"Respiration 4-7-8 — Sommeil",
+        desc:"4 cycles. Écrans éteints. Devenir automatique.",
+        time:"22h20", tags:["b"], dur:3
+      },
+    ]
+  },
+
+  // ── SEMAINES 5-6 : CONTRÔLE ─────────────────────────────────
+  // Kegel : Kegel en escalier + Reverse Kegel
+  // Technique : Squeeze technique + edging 15 min
+  // Respiration : Abdominale + expiration longue
+  // Durée : 30-35 min
+  "5-6": {
+    phase: "CONTRÔLE",
+    objectif: "Maîtrise de la montée + seuil d'excitation",
+    duree: "30–35 min / jour",
+    tasks: [
+      {
+        id:"cc_matin", slot:"bureau",
+        title:"Cohérence cardiaque — Matin",
+        desc:"5 min. Routine ancrée.",
+        time:"10h30", tags:["b"], dur:5
+      },
+      {
+        id:"kegel_escalier", slot:"bureau",
+        title:"Kegel en escalier",
+        desc:"Contracter par paliers : 25% → 50% → 75% → 100% de force → redescendre. 5 cycles complets. Contrôle graduel et précision. (Niveau intermédiaire)",
+        time:"10h45", tags:["k"], dur:8
+      },
+      {
+        id:"reverse_kegel", slot:"bureau",
+        title:"Reverse Kegel — Relâchement actif",
+        desc:"Pousser DOUCEMENT vers l'extérieur (l'inverse exact du Kegel) → maintenir 5 sec → relâcher. 10 répétitions. Technique anti-réflexe directe. NOUVEAU en sem. 5-6.",
+        time:"11h05", tags:["k"], dur:5
+      },
+      {
+        id:"resp_abdo", slot:"pause",
+        title:"Respiration abdominale profonde",
+        desc:"Gonfler le ventre à l'inspiration, pas la poitrine. Engagement du diaphragme. 10 cycles lents. Relâche la tension pelvienne — crucial pendant l'acte.",
+        time:"13h00", tags:["b"], dur:5
+      },
+      {
+        id:"expiration_longue", slot:"pause",
+        title:"Entraînement — Expiration longue",
+        desc:"Quand l'excitation monte (simuler mentalement) : expirer LENTEMENT et longuement 8–10 sec. 10 répétitions. Décharge l'énergie nerveuse sympathique. À automatiser pour les séances.",
+        time:"15h00", tags:["b","m"], dur:5
+      },
+      {
+        id:"sport", slot:"soir",
+        title:"Cardio léger (3× / semaine)",
+        desc:"30 min. Respiration abdominale pendant tout l'effort.",
+        time:"19h00", tags:["s"], dur:30
+      },
+      {
+        id:"cc_soir", slot:"soir",
+        title:"Cohérence cardiaque — Soir",
+        desc:"5 min.",
+        time:"19h30", tags:["b"], dur:5
+      },
+      {
+        id:"resp_478_avant", slot:"nuit",
+        title:"Respiration 4-7-8 — Avant séance",
+        desc:"4 cycles. Préparer le SNA avant la séance de Squeeze + Edging.",
+        time:"20h45", tags:["b"], dur:3
+      },
+      {
+        id:"squeeze_edging", slot:"nuit",
+        title:"Squeeze + Edging — 15 min de plateau",
+        desc:"Stop & Start classique. Quand à 8/10 : squeeze ferme sur le frein 10–15 sec → attendre → reprendre. Objectif : maintenir le plateau 15 min. (Semans, 1956 — cliniquement éprouvée)",
+        time:"21h00", tags:["t"], dur:30
+      },
+      {
+        id:"reverse_kegel_nuit", slot:"nuit",
+        title:"Reverse Kegel de nuit",
+        desc:"10 Reverse Kegel doux allongé. Coordonner avec la respiration. Alternance Kegel/Reverse dans la même séance.",
+        time:"22h00", tags:["k"], dur:5
+      },
+      {
+        id:"resp_478", slot:"nuit",
+        title:"Respiration 4-7-8 — Sommeil",
+        desc:"4 cycles.",
+        time:"22h15", tags:["b"], dur:3
+      },
+    ]
+  },
+
+  // ── SEMAINES 7-8 : INTÉGRATION ──────────────────────────────
+  // Kegel : Tous exercices PC × 1/jour
+  // Technique : Edging 20 min + balayage corporel
+  // Respiration : Respiration inversée au seuil critique
+  // Durée : 30 min
+  "7-8": {
+    phase: "INTÉGRATION",
+    objectif: "Transférer les acquis en situation réelle",
+    duree: "30 min / jour",
+    tasks: [
+      {
+        id:"cc_matin", slot:"bureau",
+        title:"Cohérence cardiaque — Matin",
+        desc:"5 min. Automatique.",
+        time:"10h30", tags:["b"], dur:5
+      },
+      {
+        id:"kegel_complet", slot:"bureau",
+        title:"Programme PC complet — Tous exercices × 1/jour",
+        desc:"Bloc unique : Kegel lent (5 reps × 15 sec) + Kegel escalier (3 cycles 25%→100%) + Fast Kegel (30 × 3 séries) + Reverse Kegel (10 × 5 sec). Tous exercices en une séance.",
+        time:"10h45", tags:["k"], dur:15
+      },
+      {
+        id:"mindful_scan", slot:"pause",
+        title:"Balayage corporel profond",
+        desc:"15 min. Observer les sensations avec précision. Visualiser la détente pelvienne. Intégrer l'expiration longue sur chaque tension détectée. (Mindfulness somatique)",
+        time:"13h00", tags:["m"], dur:15
+      },
+      {
+        id:"resp_inversee_entrainement", slot:"pause",
+        title:"Entraînement — Respiration inversée",
+        desc:"Inspirer court → retenir 2 sec → expirer très lentement (10 sec). 8 cycles. NOUVELLE technique sem. 7-8 : à automatiser pour le moment critique.",
+        time:"15h00", tags:["b"], dur:5
+      },
+      {
+        id:"sport", slot:"soir",
+        title:"Cardio léger (3× / semaine)",
+        desc:"30 min.",
+        time:"19h00", tags:["s"], dur:30
+      },
+      {
+        id:"cc_soir", slot:"soir",
+        title:"Cohérence cardiaque — Soir",
+        desc:"5 min.",
+        time:"19h30", tags:["b"], dur:5
+      },
+      {
+        id:"resp_478_avant", slot:"nuit",
+        title:"Respiration 4-7-8 — Avant séance",
+        desc:"4 cycles. Préparer le SNA.",
+        time:"20h45", tags:["b"], dur:3
+      },
+      {
+        id:"edging_20", slot:"nuit",
+        title:"Edging — 20 min de plateau + balayage",
+        desc:"Rester à 7–8/10 le plus longtemps possible. Balayage corporel intégré pendant la séance. Au seuil critique : déclencher la respiration inversée (inspirer court → expirer 10 sec). Toutes techniques ensemble.",
+        time:"21h00", tags:["t","m"], dur:35
+      },
+      {
+        id:"resp_478", slot:"nuit",
+        title:"Respiration 4-7-8 — Sommeil",
+        desc:"4 cycles.",
+        time:"22h15", tags:["b"], dur:3
+      },
+    ]
+  },
+
+  // ── SEMAINES 9-10 : CONSOLIDATION ───────────────────────────
+  // Kegel : maintenance × 1/jour
+  // Technique : Sessions libres avec techniques intégrées
+  // Respiration : Toutes techniques intégrées naturellement
+  // Durée : 20-25 min
+  "9-10": {
+    phase: "CONSOLIDATION",
+    objectif: "Maintenir les gains + réduire la charge mentale",
+    duree: "20–25 min / jour",
+    tasks: [
+      {
+        id:"cc_matin", slot:"bureau",
+        title:"Cohérence cardiaque — Matin",
+        desc:"5 min. Naturelle.",
+        time:"10h30", tags:["b"], dur:5
+      },
+      {
+        id:"kegel_maint", slot:"bureau",
+        title:"Kegel maintenance × 1/jour",
+        desc:"Programme allégé : Kegel lent (5 reps) + Escalier (3 cycles) + Reverse Kegel (8 reps). 12 min max. Maintien des acquis sans surcharge.",
+        time:"11h00", tags:["k"], dur:12
+      },
+      {
+        id:"sport", slot:"soir",
+        title:"Cardio léger (3× / semaine)",
+        desc:"30 min. Sport plaisir.",
+        time:"19h00", tags:["s"], dur:30
+      },
+      {
+        id:"cc_soir", slot:"soir",
+        title:"Cohérence cardiaque — Soir",
+        desc:"5 min.",
+        time:"19h30", tags:["b"], dur:5
+      },
+      {
+        id:"session_libre", slot:"nuit",
+        title:"Session libre — Techniques intégrées",
+        desc:"Pratique libre. Toutes les techniques doivent être intégrées naturellement : Stop & Start, Squeeze, Reverse Kegel, respiration inversée. Réduire la charge mentale consciente. Observer les progrès.",
+        time:"21h00", tags:["t"], dur:20
+      },
+      {
+        id:"resp_478", slot:"nuit",
+        title:"Respiration 4-7-8 — Sommeil",
+        desc:"4 cycles. Naturel.",
+        time:"22h15", tags:["b"], dur:3
+      },
+    ]
+  },
+
+  // ── SEMAINES 11-12 : MAÎTRISE ───────────────────────────────
+  // Kegel : 3–4/semaine (pas tous les jours)
+  // Technique : Pratique libre, sans protocole rigide
+  // Respiration : Respiration naturelle et consciente
+  // Durée : 15-20 min
+  "11-12": {
+    phase: "MAÎTRISE",
+    objectif: "Automatisation — sans effort conscient",
+    duree: "15–20 min / jour",
+    tasks: [
+      {
+        id:"cc_matin", slot:"bureau",
+        title:"Cohérence cardiaque — Matin",
+        desc:"5 min. Complètement automatique.",
+        time:"10h30", tags:["b"], dur:5
+      },
+      {
+        id:"kegel_leger", slot:"bureau",
+        title:"Kegel léger — 3 à 4× par semaine",
+        desc:"Maintenance légère. 10 min max. Kegel lent + Reverse Kegel. Pas tous les jours : le muscle est renforcé, la fréquence baisse. Éviter la régression uniquement.",
+        time:"11h00", tags:["k"], dur:10
+      },
+      {
+        id:"sport", slot:"soir",
+        title:"Sport (3× / semaine)",
+        desc:"30 min. Condition physique générale maintenue.",
+        time:"19h00", tags:["s"], dur:30
+      },
+      {
+        id:"pratique_nat", slot:"nuit",
+        title:"Pratique naturelle — Sans protocole",
+        desc:"Pratique libre sans protocole rigide. Les techniques Stop & Start, Squeeze, Reverse Kegel, respiration inversée sont automatisées. Célébrer les progrès — comparer avec la semaine 1.",
+        time:"21h00", tags:["t"], dur:15
+      },
+      {
+        id:"resp_nat", slot:"nuit",
+        title:"Respiration naturelle et consciente",
+        desc:"Quelques cycles 4-7-8 ou cohérence cardiaque selon l'envie. Intégrée sans effort.",
+        time:"22h15", tags:["b"], dur:3
+      },
+    ]
+  }
+};
+
+// ═══════════════════════════════════════════════════════════════
+// HELPERS
+// ═══════════════════════════════════════════════════════════════
+const PHASES_LIST = [null,"1-2","1-2","3-4","3-4","5-6","5-6","7-8","7-8","9-10","9-10","11-12","11-12"];
+const PHASE_LABELS = {"1-2":"Fondation","3-4":"Renforcement","5-6":"Contrôle","7-8":"Intégration","9-10":"Consolidation","11-12":"Maîtrise"};
+
+const SK = 'p4_state', WK = 'p4_week', STK = 'p4_streak', TK = 'p4_today';
+
+function today(){ const d=new Date(); return `${d.getFullYear()}-${d.getMonth()}-${d.getDate()}`; }
+function loadState(){ try{return JSON.parse(localStorage.getItem(SK))||{};}catch{return{};} }
+function saveState(s){ localStorage.setItem(SK,JSON.stringify(s)); }
+function loadWeek(){ return parseInt(localStorage.getItem(WK))||1; }
+function saveWeek(w){ localStorage.setItem(WK,w); }
+function loadStreak(){ return parseInt(localStorage.getItem(STK))||0; }
+function getKey(w){ return PHASES_LIST[w]; }
+
+function getProgram(w){
+  const key = getKey(w);
+  return PROGRAM[key];
+}
+
+function checkNewDay(){
+  const last = localStorage.getItem(TK);
+  const now  = today();
+  if(last !== now){
+    const state = loadState();
+    const prog  = getProgram(loadWeek());
+    const allDone = prog.tasks.every(t => state[t.id]);
+    let streak = loadStreak();
+    if(last){ streak = allDone ? streak+1 : 0; }
+    localStorage.setItem(STK, streak);
+    localStorage.setItem(TK, now);
+    saveState({});
+  }
+}
+
+// ═══════════════════════════════════════════════════════════════
+// RENDER
+// ═══════════════════════════════════════════════════════════════
+function render(){
+  const w    = loadWeek();
+  const key  = getKey(w);
+  const prog = getProgram(w);
+  const state= loadState();
+
+  document.getElementById('wkNum').textContent  = w;
+  document.getElementById('phase').textContent  = PHASE_LABELS[key];
+  document.getElementById('bTitle').textContent = `Semaine ${w} — ${prog.phase}`;
+  document.getElementById('bSub').textContent   = `Objectif : ${prog.objectif}`;
+  document.getElementById('bDesc').textContent  = `Durée totale estimée : ${prog.duree}`;
+  document.getElementById('streak').textContent = loadStreak();
+
+  const list = document.getElementById('taskList');
+  list.innerHTML = '';
+
+  const slots = [
+    {id:"bureau", label:"🏢 Au bureau (matin)"},
+    {id:"pause",  label:"☀️ Pause / Journée"},
+    {id:"soir",   label:"🌆 Soir"},
+    {id:"nuit",   label:"🌙 Nuit"},
+  ];
+
+  slots.forEach(slot => {
+    const tasks = prog.tasks.filter(t => t.slot === slot.id);
+    if(!tasks.length) return;
+    const lbl = document.createElement('div');
+    lbl.className = 'sec-lbl';
+    lbl.textContent = slot.label;
+    list.appendChild(lbl);
+    tasks.forEach(t => list.appendChild(makeTask(t, !!state[t.id])));
+  });
+
+  updateProgress(prog, state);
+}
+
+function tagLabel(t){ return{k:"Kegel",b:"Respiration",m:"Mindfulness",t:"Technique",s:"Sport"}[t]||t; }
+
+function makeTask(task, done){
+  const el = document.createElement('div');
+  el.className = 'task'+(done?' done':'');
+  el.dataset.id = task.id;
+  const tags = task.tags.map(t=>`<span class="tag ${t}">${tagLabel(t)}</span>`).join('')
+             + `<span class="tag d">⏱ ${task.dur} min</span>`;
+  el.innerHTML = `
+    <div class="chk"><span class="chk-ico">✓</span></div>
+    <div class="t-body">
+      <div class="t-head">
+        <div class="t-title">${task.title}</div>
+        <div class="t-time">${task.time}</div>
+      </div>
+      <div class="t-desc">${task.desc}</div>
+      <div class="t-tags">${tags}</div>
+    </div>`;
+  el.onclick = () => toggle(el, task.id);
+  return el;
+}
+
+function updateProgress(prog, state){
+  const tasks = prog.tasks;
+  const done  = tasks.filter(t => state[t.id]).length;
+  const total = tasks.length;
+  const pct   = total ? Math.round((done/total)*100) : 0;
+  const rem   = tasks.filter(t=>!state[t.id]).reduce((a,t)=>a+t.dur,0);
+  document.getElementById('progTxt').textContent  = `${done} / ${total} tâches`;
+  document.getElementById('progPct').textContent  = `${pct}%`;
+  document.getElementById('progFill').style.width = `${pct}%`;
+  document.getElementById('doneN').textContent    = done;
+  document.getElementById('totalN').textContent   = total;
+  document.getElementById('minLeft').textContent  = `~${rem}`;
+}
+
+function toggle(el, id){
+  const state = loadState();
+  const rect  = el.getBoundingClientRect();
+  const cx = rect.left+rect.width/2, cy = rect.top+rect.height/2;
+  if(!state[id]){
+    state[id]=true;
+    el.classList.add('done','jd');
+    setTimeout(()=>el.classList.remove('jd'),350);
+    spawnDots(cx,cy);
+  } else {
+    state[id]=false;
+    el.classList.remove('done');
+  }
+  saveState(state);
+  updateProgress(getProgram(loadWeek()), state);
+}
+
+function spawnDots(x,y){
+  const colors=['#4f8ef7','#22c55e','#7c3aed','#06b6d4','#f97316'];
+  for(let i=0;i<8;i++){
+    const d=document.createElement('div');
+    d.className='pdot';
+    const a=(i/8)*Math.PI*2, r=30+Math.random()*40;
+    d.style.cssText=`left:${x}px;top:${y}px;background:${colors[Math.floor(Math.random()*colors.length)]};--tx:${Math.cos(a)*r}px;--ty:${Math.sin(a)*r}px;`;
+    document.body.appendChild(d);
+    setTimeout(()=>d.remove(),650);
+  }
+}
+
+function resetDay(){
+  if(confirm('Remettre toutes les tâches à zéro ?')){ saveState({}); render(); }
+}
+
+// ═══════════════════════════════════════════════════════════════
+// WEEK MODAL
+// ═══════════════════════════════════════════════════════════════
+function openModal(){
+  const cur = loadWeek();
+  const grid = document.getElementById('wgrid');
+  grid.innerHTML='';
+  for(let w=1;w<=12;w++){
+    const key = getKey(w);
+    const btn = document.createElement('div');
+    btn.className='wbtn'+(w===cur?' active':'');
+    btn.innerHTML=`<div class="wbn">S${w}</div><div class="wbp">${PHASE_LABELS[key]}</div>`;
+    btn.onclick=()=>{ saveWeek(w); saveState({}); render(); closeModal(); };
+    grid.appendChild(btn);
+  }
+  document.getElementById('wkOverlay').classList.add('open');
+}
+function closeModal(){ document.getElementById('wkOverlay').classList.remove('open'); }
+function closeModalOut(e){ if(e.target===document.getElementById('wkOverlay')) closeModal(); }
+
+// ═══════════════════════════════════════════════════════════════
+// TABS
+// ═══════════════════════════════════════════════════════════════
+document.querySelectorAll('.tab').forEach(tab=>{
+  tab.addEventListener('click',()=>{
+    document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
+    tab.classList.add('active');
+    const k=tab.dataset.tab;
+    document.getElementById('tab-today').style.display = k==='today'?'':'none';
+    document.getElementById('tab-tips').style.display  = k==='tips'?'':'none';
+    document.getElementById('tab-donts').style.display = k==='donts'?'':'none';
+  });
+});
+
+// ═══════════════════════════════════════════════════════════════
+// DATE HEADER
+// ═══════════════════════════════════════════════════════════════
+function updateHeader(){
+  const days=['Dimanche','Lundi','Mardi','Mercredi','Jeudi','Vendredi','Samedi'];
+  const months=['jan','fév','mar','avr','mai','juin','juil','août','sep','oct','nov','déc'];
+  const d=new Date();
+  document.getElementById('dayLbl').textContent = days[d.getDay()];
+  document.getElementById('dateLbl').textContent= `${d.getDate()} ${months[d.getMonth()]} ${d.getFullYear()}`;
+}
+
+// ═══════════════════════════════════════════════════════════════
+// INIT
+// ═══════════════════════════════════════════════════════════════
+checkNewDay();
+updateHeader();
+render();
+</script>
+</body>
+</html>
