@@ -145,6 +145,46 @@
   .t-chrono-btn{margin-top:10px;display:inline-flex;align-items:center;gap:6px;background:rgba(79,142,247,0.1);border:1px solid rgba(79,142,247,0.2);border-radius:10px;padding:6px 12px;font-size:12px;font-weight:600;color:var(--accent);cursor:pointer;transition:all .2s;}
   .t-chrono-btn:active{transform:scale(.96);}
   .task.done .t-chrono-btn{opacity:.3;pointer-events:none;}
+
+  /* ═══════════════════════════════════════
+     SPORT MODAL
+  ══════════════════════════════════════════ */
+  .sport-overlay{position:fixed;inset:0;background:rgba(0,0,0,0.85);z-index:150;display:flex;align-items:flex-end;justify-content:center;opacity:0;pointer-events:none;transition:opacity .25s;}
+  .sport-overlay.open{opacity:1;pointer-events:all;}
+  .sport-modal{background:var(--surface);border-radius:28px 28px 0 0;padding:0 0 calc(24px + env(safe-area-inset-bottom));width:100%;max-width:500px;transform:translateY(40px);transition:transform .3s cubic-bezier(.4,0,.2,1);max-height:88vh;display:flex;flex-direction:column;}
+  .sport-overlay.open .sport-modal{transform:translateY(0);}
+
+  .sport-modal-header{padding:22px 20px 14px;border-bottom:1px solid var(--border);flex-shrink:0;}
+  .sport-modal-drag{width:36px;height:4px;background:rgba(255,255,255,0.15);border-radius:99px;margin:0 auto 18px;}
+  .sport-modal-title{font-size:16px;font-weight:700;text-align:center;margin-bottom:4px;}
+  .sport-modal-sub{font-size:12px;color:var(--muted);text-align:center;}
+
+  .sport-toggle{display:flex;gap:8px;padding:12px 20px;flex-shrink:0;}
+  .sport-toggle-btn{flex:1;padding:9px;border-radius:12px;font-family:'DM Sans',sans-serif;font-size:12px;font-weight:700;border:1.5px solid var(--border);background:var(--surface2);color:var(--muted);cursor:pointer;transition:all .2s;text-align:center;}
+  .sport-toggle-btn.active{background:rgba(34,197,94,0.15);border-color:rgba(34,197,94,0.35);color:#4ade80;}
+
+  .sport-exos-list{overflow-y:auto;padding:4px 20px 8px;flex:1;}
+
+  .exo-card{background:var(--surface2);border:1.5px solid var(--border);border-radius:16px;padding:14px;margin-bottom:10px;position:relative;overflow:hidden;}
+  .exo-card::before{content:'';position:absolute;left:0;top:0;bottom:0;width:3px;border-radius:0 3px 3px 0;background:var(--green);}
+  .exo-card-head{display:flex;justify-content:space-between;align-items:flex-start;gap:8px;margin-bottom:6px;}
+  .exo-card-name{font-size:14px;font-weight:700;color:var(--text);line-height:1.3;}
+  .exo-card-sets{font-family:'DM Mono',monospace;font-size:11px;color:var(--green);font-weight:600;background:rgba(34,197,94,0.12);padding:3px 9px;border-radius:6px;white-space:nowrap;flex-shrink:0;}
+  .exo-card-desc{font-size:12px;color:var(--muted);line-height:1.5;margin-bottom:10px;}
+  .exo-card-bottom{display:flex;align-items:center;justify-content:space-between;gap:8px;}
+  .exo-card-muscles{display:flex;gap:5px;flex-wrap:wrap;}
+  .muscle-tag{font-size:10px;font-weight:600;padding:3px 8px;border-radius:6px;background:rgba(79,142,247,0.12);color:#93c5fd;}
+  .exo-chrono-btn{display:inline-flex;align-items:center;gap:5px;background:rgba(79,142,247,0.1);border:1px solid rgba(79,142,247,0.2);border-radius:9px;padding:5px 10px;font-size:11px;font-weight:600;color:var(--accent);cursor:pointer;transition:all .2s;flex-shrink:0;}
+  .exo-chrono-btn:active{transform:scale(.96);}
+
+  .sport-modal-footer{padding:14px 20px 0;flex-shrink:0;border-top:1px solid var(--border);}
+  .sport-close-btn{width:100%;padding:14px;border-radius:16px;font-family:'DM Sans',sans-serif;font-size:15px;font-weight:700;border:1.5px solid var(--border);background:var(--surface2);color:var(--muted);cursor:pointer;transition:all .2s;}
+  .sport-close-btn:active{transform:scale(.98);}
+
+  /* Bouton sport sur la tâche */
+  .t-sport-btn{margin-top:10px;display:inline-flex;align-items:center;gap:6px;background:rgba(34,197,94,0.1);border:1px solid rgba(34,197,94,0.25);border-radius:10px;padding:6px 12px;font-size:12px;font-weight:600;color:#4ade80;cursor:pointer;transition:all .2s;}
+  .t-sport-btn:active{transform:scale(.96);}
+  .task.done .t-sport-btn{opacity:.3;pointer-events:none;}
 </style>
 </head>
 <body>
@@ -213,6 +253,25 @@
   <button class="rbtn" onclick="resetDay()">Réinit.</button>
 </div>
 
+<!-- SPORT MODAL -->
+<div class="sport-overlay" id="sportOverlay" onclick="closeSportOut(event)">
+  <div class="sport-modal">
+    <div class="sport-modal-header">
+      <div class="sport-modal-drag"></div>
+      <div class="sport-modal-title" id="sportModalTitle">🏋️ Séance du jour</div>
+      <div class="sport-modal-sub" id="sportModalSub">Choisis ton cardio pour aujourd'hui</div>
+    </div>
+    <div class="sport-toggle">
+      <button class="sport-toggle-btn active" id="toggleVelo" onclick="switchSportTab('velo')">🚴 Avec vélo</button>
+      <button class="sport-toggle-btn" id="toggleMaison" onclick="switchSportTab('maison')">🏠 Sans vélo</button>
+    </div>
+    <div class="sport-exos-list" id="sportExosList"></div>
+    <div class="sport-modal-footer">
+      <button class="sport-close-btn" onclick="closeSportModal()">Fermer</button>
+    </div>
+  </div>
+</div>
+
 <!-- CHRONO MODAL -->
 <div class="chrono-overlay" id="chronoOverlay" onclick="closeChronoOut(event)">
   <div class="chrono-modal">
@@ -248,11 +307,129 @@
 
 <script>
 // ═══════════════════════════════════════════════════════════════
-// DONNÉES — calquées exactement sur l'Excel mieux_dormir.xlsx
+// EXERCICES ALTERNATIFS AU VÉLO — par phase
+// Structure : { velo: {...}, maison: [ {exos par semaine} ] }
+// ═══════════════════════════════════════════════════════════════
+
+const SPORT_PHASES = {
+
+  "1-2": {
+    label: "Semaines 1–2 — Fondation",
+    sub: "20 min de cardio + respiration abdominale pendant tout l'effort",
+    velo: { dur: 20, desc: "Pédaler 20 min à allure modérée. Respiration abdominale pendant tout l'effort : gonfler le ventre à l'inspiration, pas la poitrine. 3 fois cette semaine." },
+    maison: [
+      { nom: "🧎 Gainage ventral (planche)", sets: "3 × 20 sec", muscles: ["Abdos","Lombaires"], desc: "Position planche : bras tendus ou sur les coudes, dos droit. Tenir sans bloquer la respiration. Expirer lentement.", dur: 3 },
+      { nom: "🤸 Pompes classiques", sets: "3 × 8 reps", muscles: ["Pectoraux","Triceps","Épaules"], desc: "Mains à largeur d'épaules, dos droit, descendre jusqu'à ce que la poitrine frôle le sol. Expirer en montant.", dur: 4 },
+      { nom: "🦵 Squats au poids du corps", sets: "3 × 12 reps", muscles: ["Quadriceps","Fessiers","Ischio"], desc: "Pieds à largeur d'épaules, descendre comme pour s'asseoir, genoux dans l'axe des pieds. Dos droit, regard droit.", dur: 5 },
+      { nom: "🏃 Jumping Jacks", sets: "3 × 30 sec", muscles: ["Cardio","Corps entier"], desc: "Écarter bras et jambes simultanément en sautant. Remplace le cardio vélo sur 3 séries. Respiration abdominale.", dur: 5 },
+      { nom: "🧘 Étirements post-séance", sets: "5–8 min", muscles: ["Ischio","Quad","Hanches"], desc: "Après l'effort uniquement. Ischio (30 sec chaque jambe) + quadriceps debout (30 sec chaque jambe) + hanches au sol (30 sec chaque côté).", dur: 8 },
+    ]
+  },
+
+  "3-4": {
+    label: "Semaines 3–4 — Renforcement",
+    sub: "25 min de cardio + 3 séries de 10 pompes",
+    velo: { dur: 25, desc: "Vélo 25 min à allure modérée. Enchaîner avec 3 séries de 10 pompes. Respiration abdominale pendant tout l'effort." },
+    maison: [
+      { nom: "🏃 Corde à sauter / Shadow boxing", sets: "3 × 45 sec", muscles: ["Cardio","Épaules","Mollets"], desc: "Sauter à la corde ou faire du shadow boxing intensif. Maintenir le rythme 45 sec. Pause 15 sec entre séries. Remplace le vélo.", dur: 6 },
+      { nom: "🤸 Pompes classiques", sets: "3 × 10 reps", muscles: ["Pectoraux","Triceps","Épaules"], desc: "Mains à largeur d'épaules, dos droit, descendre jusqu'à ce que la poitrine frôle le sol. Expirer en montant.", dur: 5 },
+      { nom: "🦵 Fentes alternées", sets: "3 × 10 reps/jambe", muscles: ["Quadriceps","Fessiers","Ischio"], desc: "Faire un pas en avant, descendre le genou arrière vers le sol sans le toucher. Alterner gauche/droite. Dos bien droit.", dur: 6 },
+      { nom: "🧎 Gainage ventral", sets: "3 × 25 sec", muscles: ["Abdos","Lombaires"], desc: "Position planche sur les coudes. Dos rigide, pas de creux dans les reins. Expirer lentement, ne pas retenir la respiration.", dur: 3 },
+      { nom: "🏋️ Dips sur chaise", sets: "3 × 8 reps", muscles: ["Triceps","Épaules"], desc: "Mains sur le bord d'une chaise, jambes tendues devant. Fléchir les coudes jusqu'à 90°, remonter. Expirer en montant.", dur: 4 },
+      { nom: "🧘 Étirements post-séance", sets: "5–8 min", muscles: ["Ischio","Quad","Hanches","Pectoraux"], desc: "Après l'effort uniquement. Ischio + quadriceps + hanches + pectoraux contre un mur (30 sec chaque) + dos en boule au sol.", dur: 8 },
+    ]
+  },
+
+  "5-6": {
+    label: "Semaines 5–6 — Contrôle",
+    sub: "30 min de cardio + pompes + gainage",
+    velo: { dur: 30, desc: "Vélo 30 min. Enchaîner : 3×12 pompes + 3×30 sec de gainage ventral (planche). Respiration abdominale pendant tout l'effort." },
+    maison: [
+      { nom: "🏃 Burpees", sets: "3 × 8 reps", muscles: ["Cardio","Corps entier"], desc: "Debout → accroupi → planche → pompe → saut. Enchainement continu. Cardio intense qui remplace avantageusement le vélo. Respiration abdominale.", dur: 6 },
+      { nom: "🤸 Pompes — Prise large", sets: "3 × 12 reps", muscles: ["Pectoraux","Épaules"], desc: "Mains écartées au-delà des épaules. Descendre lentement (3 sec) → remonter explosif. Expirer en poussant.", dur: 5 },
+      { nom: "🧎 Gainage ventral", sets: "3 × 30 sec", muscles: ["Abdos","Lombaires"], desc: "Position planche sur les coudes ou bras tendus. Dos rigide. Expirer lentement, ne jamais bloquer la respiration.", dur: 4 },
+      { nom: "🦵 Squats sautés", sets: "3 × 10 reps", muscles: ["Cardio","Quadriceps","Fessiers"], desc: "Squat normal puis sauter en extension complète. Atterrir doucement sur les talons. Génère un cardio puissant en peu de reps.", dur: 5 },
+      { nom: "🏋️ Dips sur chaise", sets: "3 × 10 reps", muscles: ["Triceps","Épaules"], desc: "Mains sur le bord d'une chaise, jambes tendues ou fléchies. Fléchir les coudes à 90° → remonter. Expirer en montant.", dur: 4 },
+      { nom: "🧘 Étirements post-séance", sets: "5–8 min", muscles: ["Corps entier"], desc: "Après l'effort uniquement. Ischio + quadriceps + hanches + pectoraux + dos en boule. Total 5–8 min.", dur: 8 },
+    ]
+  },
+
+  "7-8": {
+    label: "Semaines 7–8 — Intégration",
+    sub: "30 min de cardio + pompes + dips + gainage",
+    velo: { dur: 30, desc: "Vélo 30 min. Enchaîner : 3×15 pompes + 3×10 dips sur chaise + 3×45 sec de gainage ventral. Respiration abdominale pendant tout l'effort." },
+    maison: [
+      { nom: "🏃 Circuit cardio — 4 exercices", sets: "3 tours", muscles: ["Cardio","Corps entier"], desc: "Enchaîner sans pause : 20 jumping jacks + 10 squats sautés + 10 mountain climbers + 10 sec gainage. Pause 30 sec entre les tours. Remplace le vélo.", dur: 15 },
+      { nom: "🤸 Pompes — Prise serrée", sets: "3 × 15 reps", muscles: ["Triceps","Pectoraux"], desc: "Mains rapprochées sous la poitrine. Coudes longeant le corps. Descendre lentement → remonter. Expirer en poussant.", dur: 6 },
+      { nom: "🏋️ Dips sur chaise", sets: "3 × 10 reps", muscles: ["Triceps","Épaules"], desc: "Mains sur le bord d'une chaise, jambes tendues. Fléchir les coudes à 90° → remonter. Expirer en remontant.", dur: 5 },
+      { nom: "🧎 Gainage ventral", sets: "3 × 45 sec", muscles: ["Abdos","Lombaires"], desc: "Position planche sur les coudes. Dos rigide. Respiration lente et abdominale pendant toute la durée. Ne jamais bloquer.", dur: 5 },
+      { nom: "🦵 Fentes sautées", sets: "3 × 8 reps/jambe", muscles: ["Cardio","Fessiers","Quadriceps"], desc: "Fente puis saut en changeant de jambe en l'air. Atterrir doucement. Intensité cardio élevée. Respiration abdominale.", dur: 6 },
+      { nom: "🧘 Étirements post-séance", sets: "5–8 min", muscles: ["Corps entier"], desc: "Après l'effort uniquement. Ischio + quadriceps + hanches + pectoraux + dos en boule. Total 5–8 min.", dur: 8 },
+    ]
+  },
+
+  "9-10": {
+    label: "Semaines 9–10 — Consolidation",
+    sub: "35 min de cardio + pompes + dips + tractions + gainage",
+    velo: { dur: 35, desc: "Vélo 35 min. Enchaîner : 3×15 pompes + 3×12 dips + 3×5 tractions (ou tirage élastique) + 3×50 sec gainage. Respiration abdominale." },
+    maison: [
+      { nom: "🏃 HIIT maison — 5 tours", sets: "5 tours", muscles: ["Cardio","Corps entier"], desc: "1 tour = 10 burpees + 10 mountain climbers + 10 squats sautés. Pause 45 sec entre chaque tour. Remplace amplement le vélo.", dur: 18 },
+      { nom: "🤸 Pompes — Feet elevated", sets: "3 × 15 reps", muscles: ["Pectoraux hauts","Épaules"], desc: "Pieds posés sur une chaise, mains au sol. Angle incliné qui cible le haut des pectoraux. Descendre lentement → remonter.", dur: 6 },
+      { nom: "🏋️ Dips sur chaise", sets: "3 × 12 reps", muscles: ["Triceps","Épaules"], desc: "Jambes tendues, mains sur le bord d'une chaise. Fléchir à 90° → remonter. Expirer en montant.", dur: 5 },
+      { nom: "💪 Tirage élastique / Serviette-porte", sets: "3 × 5–8 reps", muscles: ["Dos","Biceps"], desc: "Avec un élastique ou en tirant sur une porte entrouverte avec une serviette : tirer vers soi en gardant les coudes collés au corps. Remplace les tractions si pas de barre.", dur: 5 },
+      { nom: "🧎 Gainage ventral", sets: "3 × 50 sec", muscles: ["Abdos","Lombaires"], desc: "Position planche sur les coudes. Dos rigide. Respiration abdominale lente et continue. Ne jamais retenir sa respiration.", dur: 5 },
+      { nom: "🧘 Étirements post-séance", sets: "5–8 min", muscles: ["Corps entier"], desc: "Après l'effort uniquement. Ischio + quadriceps + hanches + pectoraux + dos en boule. Total 5–8 min.", dur: 8 },
+    ]
+  },
+
+  "11-12": {
+    label: "Semaines 11–12 — Maîtrise",
+    sub: "35 min de cardio + programme haut du corps complet",
+    velo: { dur: 35, desc: "Vélo 35 min. Enchaîner : 3×18 pompes + 3×12 dips + 3×8 tractions + 3×55 sec gainage + 3×10 superman allongé. Respiration abdominale." },
+    maison: [
+      { nom: "🏃 HIIT avancé — 6 tours", sets: "6 tours", muscles: ["Cardio","Corps entier"], desc: "1 tour = 12 burpees + 15 mountain climbers + 12 squats sautés. Pause 30 sec entre chaque tour. Remplace le vélo.", dur: 20 },
+      { nom: "🤸 Pompes archer", sets: "3 × 8 reps/côté", muscles: ["Pectoraux","Épaules","Triceps"], desc: "1 bras tendu sur le côté, l'autre fléchi. Descendre vers le bras fléchi. Alterne les côtés. Version avancée des pompes.", dur: 7 },
+      { nom: "🏋️ Dips sur chaise", sets: "3 × 12 reps", muscles: ["Triceps","Épaules"], desc: "Jambes tendues, mains sur le bord d'une chaise. Fléchir à 90° → remonter. Expirer en montant.", dur: 5 },
+      { nom: "💪 Tirage élastique / Serviette-porte", sets: "3 × 8 reps", muscles: ["Dos","Biceps"], desc: "Avec un élastique ou en tirant sur une porte entrouverte avec une serviette. Tirer vers soi, coudes collés au corps, contracter le dos en fin de mouvement.", dur: 5 },
+      { nom: "🧎 Gainage ventral", sets: "3 × 55 sec", muscles: ["Abdos","Lombaires"], desc: "Position planche sur les coudes. Dos rigide, fessiers à niveau. Respiration abdominale lente et continue.", dur: 5 },
+      { nom: "🦸 Superman allongé", sets: "3 × 10 reps", muscles: ["Lombaires","Fessiers","Dos"], desc: "Allongé face contre terre, bras tendus devant. Soulever simultanément bras et jambes du sol. Tenir 2 sec. Expirer en montant.", dur: 4 },
+      { nom: "🧘 Étirements post-séance", sets: "5–8 min", muscles: ["Corps entier"], desc: "Après l'effort uniquement. Ischio + quadriceps + hanches + pectoraux + dos en boule. Total 5–8 min.", dur: 8 },
+    ]
+  },
+
+};
+
+// Pour la maintenance, génère les exos dynamiquement
+function getSportMaintPhase(week) {
+  const extra = Math.floor((week - 13) / 4);
+  const cappedWeek = Math.min(week, 45);
+  const veloMin = 35 + Math.floor((Math.min(cappedWeek, 45) - 13) / 4) * 5;
+  const pompes = 18 + extra;
+  const dips = 12 + extra;
+  const tractions = 8 + extra;
+  const gainage = 55 + extra * 5;
+  const superman = 10 + extra;
+  return {
+    label: `Semaine ${week} — Maintenance`,
+    sub: `${veloMin} min de cardio + programme haut du corps complet`,
+    velo: { dur: veloMin, desc: `Vélo ${veloMin} min. Enchaîner : 3×${pompes} pompes + 3×${dips} dips + 3×${tractions} tractions + 3×${gainage} sec gainage + 3×${superman} superman allongé. Respiration abdominale.` },
+    maison: [
+      { nom: "🏃 HIIT progressif", sets: `${6 + Math.min(extra, 4)} tours`, muscles: ["Cardio","Corps entier"], desc: `1 tour = ${12 + extra} burpees + ${15 + extra} mountain climbers + ${12 + extra} squats sautés. Pause 30 sec entre tours. Intensité progressive.`, dur: 20 + extra * 2 },
+      { nom: "🤸 Pompes", sets: `3 × ${pompes} reps`, muscles: ["Pectoraux","Triceps","Épaules"], desc: "Mains à largeur d'épaules, dos droit. Varier les prises (large/serrée/archer) selon l'envie. Expirer en poussant.", dur: 7 },
+      { nom: "🏋️ Dips sur chaise", sets: `3 × ${dips} reps`, muscles: ["Triceps","Épaules"], desc: "Jambes tendues, mains sur le bord d'une chaise. Fléchir à 90° → remonter. Expirer en remontant.", dur: 5 },
+      { nom: "💪 Tirage élastique / Serviette-porte", sets: `3 × ${tractions} reps`, muscles: ["Dos","Biceps"], desc: "Tirer vers soi avec contrôle. Coudes collés au corps. Contracter le dos en fin de mouvement.", dur: 5 },
+      { nom: "🧎 Gainage ventral", sets: `3 × ${gainage} sec`, muscles: ["Abdos","Lombaires"], desc: "Position planche sur les coudes. Dos rigide. Respiration abdominale continue.", dur: 6 },
+      { nom: "🦸 Superman allongé", sets: `3 × ${superman} reps`, muscles: ["Lombaires","Fessiers","Dos"], desc: "Allongé face contre terre, bras tendus. Soulever bras et jambes simultanément. Tenir 2 sec. Expirer en montant.", dur: 4 },
+      { nom: "🧘 Étirements post-séance", sets: "5–8 min", muscles: ["Corps entier"], desc: "Après l'effort uniquement. Ischio + quadriceps + hanches + pectoraux + dos en boule. Total 5–8 min.", dur: 8 },
+    ]
+  };
+}
+
+// ═══════════════════════════════════════════════════════════════
+// DONNÉES
 // ═══════════════════════════════════════════════════════════════
 
 const PROGRAM = {
-
   "1-2": {
     phase:"FONDATION", objectif:"Renforcement de base du PC + conscience corporelle + hydratation", duree:"~30 min / jour",
     tasks:[
@@ -264,16 +441,14 @@ const PROGRAM = {
       {id:"cc_midi",    title:"🫁 Cohérence cardiaque — Midi",           desc:"Inspirer 5 sec par le nez → expirer 5 sec par la bouche. Répéter pendant 5 min. 2e séance sur 3 aujourd'hui.",                                                                                                                     time:"13h30", tags:["b"], dur:5},
       {id:"k2",         title:"💪 Kegel de base — Série 2",              desc:"Contracter le muscle PC → tenir 10 sec → relâcher 10 sec. Répéter 10 fois. 2e série de la journée obligatoire semaines 1-2.",                                                                                                      time:"14h00", tags:["k"], dur:5},
       {id:"eau_16h",    title:"💧 Eau — 16h",                            desc:"Boire 250ml. Évite le coup de fatigue de fin d'après-midi.",                                                                                                                                                                        time:"16h00", tags:["e"], dur:1},
-      {id:"sport",      title:"🚴 Vélo — 20 min",                        desc:"Pédaler 20 min à allure modérée. Respiration abdominale pendant tout l'effort : gonfler le ventre à l'inspiration, pas la poitrine. 3 fois cette semaine.",                                                                        time:"19h00", tags:["s"], dur:20},
-      {id:"etirements",  title:"🧘 Étirements — Après sport",               desc:"APRÈS le sport uniquement, jamais avant à froid. Enchaîner : ischio-jambiers debout (30 sec chaque jambe) + quadriceps debout (30 sec chaque jambe) + hanches au sol (30 sec chaque côté) + pectoraux contre un mur (30 sec) + dos en boule au sol (30 sec). Total 5-8 min.", time:"19h45", tags:["s"], dur:8},
+      {id:"sport",      title:"🚴 Sport — 20 min",                       desc:"Cardio 20 min à allure modérée + étirements. Respiration abdominale pendant tout l'effort. 3 fois cette semaine.", isSport:true,                                                                                                    time:"19h00", tags:["s"], dur:28},
       {id:"cc_soir",    title:"🫁 Cohérence cardiaque — Soir",           desc:"Inspirer 5 sec par le nez → expirer 5 sec par la bouche. Répéter pendant 5 min. 3e et dernière séance de la journée.",                                                                                                            time:"19h30", tags:["b"], dur:5},
-      {id:"stop_start", title:"🛑 Stop & Start — 5 min de plateau",      desc:"Monter à 7–8/10 d'excitation → stopper TOUTE stimulation → redescendre à 4/10 → recommencer. Objectif : cumuler 5 min passées au plateau. Jambes relâchées, fessiers non contractés, respiration abdominale. (Masters & Johnson, 1970)",  time:"21h00", tags:["t"], dur:20},
+      {id:"stop_start", title:"🛑 Stop & Start — 5 min de plateau",      desc:"Monter à 7–8/10 d'excitation → stopper TOUTE stimulation → redescendre à 4/10 → recommencer. Objectif : cumuler 5 min passées au plateau. Jambes relâchées, fessiers non contractés, respiration abdominale.",                    time:"21h00", tags:["t"], dur:20},
       {id:"k_nuit",     title:"💪 Kegel de nuit — Isométrique léger",    desc:"20 contractions très douces allongé dans le lit. 1 sec contracté / 1 sec relâché. Coordonner avec la respiration. Très doux, sans forcer. Conscience corporelle pure avant le sommeil.",                                          time:"22h00", tags:["k"], dur:5},
       {id:"resp_478",   title:"🫁 Respiration 4-7-8 — Avant sommeil",    desc:"Inspirer 4 sec → retenir 7 sec → expirer lentement 8 sec. Répéter 4 cycles minimum. Active le parasympathique et prépare au sommeil. Écrans éteints.",                                                                             time:"22h15", tags:["b"], dur:3},
       {id:"sommeil",    title:"🌙 Coucher avant 23h",                    desc:"Chambre fraîche (18-20°C), obscurité totale, écrans éteints 1h avant. Le sommeil régule testostérone et sérotonine — les deux hormones du contrôle. Priorité absolue du programme.",                                              time:"22h30", tags:["v"], dur:0},
     ]
   },
-
   "3-4": {
     phase:"RENFORCEMENT", objectif:"Endurance du PC + durée de plateau + 4-7-8 avant séance", duree:"~40 min / jour",
     tasks:[
@@ -285,8 +460,7 @@ const PROGRAM = {
       {id:"cc_midi",    title:"🫁 Cohérence cardiaque — Midi",           desc:"Inspirer 5 sec par le nez → expirer 5 sec par la bouche. Répéter pendant 5 min. 2e séance sur 3.",                                                                                                                                 time:"13h30", tags:["b"], dur:5},
       {id:"k_rapide",   title:"💪 Kegel rapide — Fast Kegel",            desc:"1 sec contracté / 1 sec relâché en séquence rapide et rythmée. 30 contractions × 3 séries. Développe la réactivité neuromusculaire du PC. Discrèt assis.",                                                                       time:"14h00", tags:["k"], dur:5},
       {id:"eau_16h",    title:"💧 Eau — 16h",                            desc:"Boire 250ml. Évite le coup de fatigue de fin d'après-midi.",                                                                                                                                                                        time:"16h00", tags:["e"], dur:1},
-      {id:"sport",      title:"🚴 Vélo 25 min + Pompes",                 desc:"Vélo 25 min à allure modérée. Enchaîner avec 3 séries de 10 pompes. Respiration abdominale pendant tout l'effort. 3 fois cette semaine.",                                                                                          time:"19h00", tags:["s"], dur:30},
-      {id:"etirements",  title:"🧘 Étirements — Après sport",               desc:"APRÈS le sport uniquement, jamais avant à froid. Enchaîner : ischio-jambiers debout (30 sec chaque jambe) + quadriceps debout (30 sec chaque jambe) + hanches au sol (30 sec chaque côté) + pectoraux contre un mur (30 sec) + dos en boule au sol (30 sec). Total 5-8 min.", time:"19h45", tags:["s"], dur:8},
+      {id:"sport",      title:"🚴 Sport — 25 min + Pompes",              desc:"Cardio 25 min + 3 séries de 10 pompes. Respiration abdominale pendant tout l'effort. 3 fois cette semaine.", isSport:true,                                                                                                         time:"19h00", tags:["s"], dur:38},
       {id:"cc_soir",    title:"🫁 Cohérence cardiaque — Soir",           desc:"Inspirer 5 sec par le nez → expirer 5 sec par la bouche. Répéter pendant 5 min. 3e et dernière séance de la journée.",                                                                                                            time:"19h30", tags:["b"], dur:5},
       {id:"resp_478_av",title:"🫁 Respiration 4-7-8 — Avant séance",     desc:"Inspirer 4 sec → retenir 7 sec → expirer lentement 8 sec. Répéter 4 cycles avant de commencer le Stop & Start. NOUVEAU sem. 3-4 : prépare le système nerveux avant la séance.",                                                   time:"20h50", tags:["b"], dur:3},
       {id:"stop_start", title:"🛑 Stop & Start — 10 min de plateau",     desc:"Monter à 7–8/10 → stopper TOUTE stimulation → redescendre à 4/10 → recommencer. Objectif : 10 min de plateau cumulé. Intégrer le balayage corporel (scanner le corps des pieds à la tête) pendant la séance. Jambes relâchées.",  time:"21h00", tags:["t"], dur:25},
@@ -295,7 +469,6 @@ const PROGRAM = {
       {id:"sommeil",    title:"🌙 Coucher avant 23h",                    desc:"Chambre fraîche (18-20°C), obscurité totale, écrans éteints. Priorité absolue.",                                                                                                                                                    time:"22h30", tags:["v"], dur:0},
     ]
   },
-
   "5-6": {
     phase:"CONTRÔLE", objectif:"Reverse Kegel + Squeeze + Edging 15 min + respiration abdominale", duree:"~45 min / jour",
     tasks:[
@@ -308,17 +481,15 @@ const PROGRAM = {
       {id:"cc_midi",    title:"🫁 Cohérence cardiaque — Midi",           desc:"Inspirer 5 sec par le nez → expirer 5 sec par la bouche. Répéter pendant 5 min.",                                                                                                                                                  time:"13h30", tags:["b"], dur:5},
       {id:"resp_abdo",  title:"🫁 Respiration abdominale profonde",      desc:"Gonfler le ventre à l'inspiration (pas la poitrine) — engagement du diaphragme. Expirer lentement et complètement. 10 cycles lents. Relâche la tension pelvienne. NOUVEAU sem. 5-6.",                                            time:"15h00", tags:["b"], dur:5},
       {id:"eau_16h",    title:"💧 Eau — 16h",                            desc:"Boire 250ml.",                                                                                                                                                                                                                      time:"16h00", tags:["e"], dur:1},
-      {id:"sport",      title:"🚴 Vélo 30 min + Pompes + Gainage",       desc:"Vélo 30 min. Enchaîner : 3×12 pompes + 3×30 sec de gainage ventral (planche). Respiration abdominale pendant tout l'effort. 3 fois cette semaine.",                                                                                time:"19h00", tags:["s"], dur:40},
-      {id:"etirements",  title:"🧘 Étirements — Après sport",               desc:"APRÈS le sport uniquement, jamais avant à froid. Enchaîner : ischio-jambiers debout (30 sec chaque jambe) + quadriceps debout (30 sec chaque jambe) + hanches au sol (30 sec chaque côté) + pectoraux contre un mur (30 sec) + dos en boule au sol (30 sec). Total 5-8 min.", time:"19h45", tags:["s"], dur:8},
+      {id:"sport",      title:"🚴 Sport — 30 min + Pompes + Gainage",    desc:"Cardio 30 min + 3×12 pompes + 3×30 sec gainage. Respiration abdominale pendant tout l'effort. 3 fois cette semaine.", isSport:true,                                                                                                time:"19h00", tags:["s"], dur:48},
       {id:"cc_soir",    title:"🫁 Cohérence cardiaque — Soir",           desc:"Inspirer 5 sec par le nez → expirer 5 sec par la bouche. Répéter pendant 5 min.",                                                                                                                                                  time:"19h30", tags:["b"], dur:5},
       {id:"resp_478_av",title:"🫁 Respiration 4-7-8 — Avant séance",     desc:"Inspirer 4 sec → retenir 7 sec → expirer lentement 8 sec. Répéter 4 cycles avant la séance de Squeeze.",                                                                                                                           time:"20h50", tags:["b"], dur:3},
-      {id:"squeeze",    title:"✊ Squeeze + Edging — 15 min plateau",    desc:"Stop & Start classique. Quand tu atteins 8/10 : squeeze ferme sur le frein pendant 10–15 sec → attendre que ça redescende → reprendre. Objectif : 15 min de plateau cumulé. Jambes relâchées. (Semans, 1956)",                   time:"21h00", tags:["t"], dur:30},
+      {id:"squeeze",    title:"✊ Squeeze + Edging — 15 min plateau",    desc:"Stop & Start classique. Quand tu atteins 8/10 : squeeze ferme sur le frein pendant 10–15 sec → attendre que ça redescende → reprendre. Objectif : 15 min de plateau cumulé. Jambes relâchées.",                                   time:"21h00", tags:["t"], dur:30},
       {id:"k_rev_nuit", title:"💪 Reverse Kegel — Nuit",                 desc:"Pousser doucement vers l'extérieur → maintenir 5 sec → relâcher. 10 répétitions allongé dans le lit. Alterner avec quelques Kegel classiques dans la même séance.",                                                               time:"22h00", tags:["k"], dur:5},
       {id:"resp_478",   title:"🫁 Respiration 4-7-8 — Avant sommeil",    desc:"Inspirer 4 sec → retenir 7 sec → expirer lentement 8 sec. Répéter 4 cycles.",                                                                                                                                                      time:"22h15", tags:["b"], dur:3},
       {id:"sommeil",    title:"🌙 Coucher avant 23h",                    desc:"Chambre fraîche (18-20°C), obscurité totale, écrans éteints. Priorité absolue.",                                                                                                                                                    time:"22h30", tags:["v"], dur:0},
     ]
   },
-
   "7-8": {
     phase:"INTÉGRATION", objectif:"Programme PC complet + Edging 20 min + respiration inversée NOUVEAU", duree:"~50 min / jour",
     tasks:[
@@ -330,16 +501,14 @@ const PROGRAM = {
       {id:"cc_midi",    title:"🫁 Cohérence cardiaque — Midi",           desc:"Inspirer 5 sec par le nez → expirer 5 sec par la bouche. Répéter pendant 5 min.",                                                                                                                                                  time:"13h30", tags:["b"], dur:5},
       {id:"resp_inv",   title:"🫁 Respiration inversée — Entraînement",  desc:"Inspirer court (2 sec) → retenir 2 sec → expirer très lentement pendant 10 sec. Répéter 8 cycles. NOUVEAU sem. 7-8 : à automatiser pour l'utiliser au moment critique pendant la séance.",                                       time:"15h00", tags:["b"], dur:5},
       {id:"eau_16h",    title:"💧 Eau — 16h",                            desc:"Boire 250ml.",                                                                                                                                                                                                                      time:"16h00", tags:["e"], dur:1},
-      {id:"sport",      title:"🚴 Vélo 30 min + Pompes + Dips + Gainage",desc:"Vélo 30 min. Enchaîner : 3×15 pompes + 3×10 dips sur chaise + 3×45 sec de gainage ventral. Respiration abdominale pendant tout l'effort. 3 fois cette semaine.",                                                                   time:"19h00", tags:["s"], dur:50},
-      {id:"etirements",  title:"🧘 Étirements — Après sport",               desc:"APRÈS le sport uniquement, jamais avant à froid. Enchaîner : ischio-jambiers debout (30 sec chaque jambe) + quadriceps debout (30 sec chaque jambe) + hanches au sol (30 sec chaque côté) + pectoraux contre un mur (30 sec) + dos en boule au sol (30 sec). Total 5-8 min.", time:"19h45", tags:["s"], dur:8},
+      {id:"sport",      title:"🚴 Sport — 30 min + Pompes + Dips + Gainage", desc:"Cardio 30 min + 3×15 pompes + 3×10 dips + 3×45 sec gainage. Respiration abdominale pendant tout l'effort. 3 fois cette semaine.", isSport:true,                                                                               time:"19h00", tags:["s"], dur:58},
       {id:"cc_soir",    title:"🫁 Cohérence cardiaque — Soir",           desc:"Inspirer 5 sec par le nez → expirer 5 sec par la bouche. Répéter pendant 5 min.",                                                                                                                                                  time:"19h30", tags:["b"], dur:5},
       {id:"resp_478_av",title:"🫁 Respiration 4-7-8 — Avant séance",     desc:"Inspirer 4 sec → retenir 7 sec → expirer lentement 8 sec. Répéter 4 cycles avant la séance d'Edging.",                                                                                                                             time:"20h50", tags:["b"], dur:3},
-      {id:"edging",     title:"🌊 Edging — 20 min plateau + balayage",   desc:"Rester à 7–8/10 le plus longtemps possible. Scanner le corps des pieds à la tête pendant la séance (balayage corporel). Au moment critique (8-9/10) : inspirer court (2 sec) → retenir 2 sec → expirer 10 sec (respiration inversée). Jambes relâchées.",  time:"21h00", tags:["t","m"], dur:35},
+      {id:"edging",     title:"🌊 Edging — 20 min plateau + balayage",   desc:"Rester à 7–8/10 le plus longtemps possible. Scanner le corps des pieds à la tête pendant la séance. Au moment critique (8-9/10) : inspirer court (2 sec) → retenir 2 sec → expirer 10 sec (respiration inversée). Jambes relâchées.", time:"21h00", tags:["t","m"], dur:35},
       {id:"resp_478",   title:"🫁 Respiration 4-7-8 — Avant sommeil",    desc:"Inspirer 4 sec → retenir 7 sec → expirer lentement 8 sec. Répéter 4 cycles.",                                                                                                                                                      time:"22h15", tags:["b"], dur:3},
       {id:"sommeil",    title:"🌙 Coucher avant 23h",                    desc:"Chambre fraîche (18-20°C), obscurité totale, écrans éteints. Priorité absolue.",                                                                                                                                                    time:"22h30", tags:["v"], dur:0},
     ]
   },
-
   "9-10": {
     phase:"CONSOLIDATION", objectif:"Maintien des acquis + automatisation progressive + sport intensifié", duree:"~55 min / jour",
     tasks:[
@@ -350,16 +519,14 @@ const PROGRAM = {
       {id:"eau_13h",    title:"💧 Eau — 13h",                            desc:"Boire 250ml.",                                                                                                                                                                                                                      time:"13h00", tags:["e"], dur:1},
       {id:"cc_midi",    title:"🫁 Cohérence cardiaque — Midi",           desc:"Inspirer 5 sec par le nez → expirer 5 sec par la bouche. Répéter pendant 5 min.",                                                                                                                                                  time:"13h30", tags:["b"], dur:5},
       {id:"eau_16h",    title:"💧 Eau — 16h",                            desc:"Boire 250ml.",                                                                                                                                                                                                                      time:"16h00", tags:["e"], dur:1},
-      {id:"sport",      title:"🚴 Vélo 35 min + Pompes + Dips + Tractions + Gainage", desc:"Vélo 35 min. Enchaîner : 3×15 pompes + 3×12 dips sur chaise + 3×5 tractions (ou tirage élastique) + 3×50 sec de gainage ventral. Respiration abdominale pendant tout l'effort. 3 fois cette semaine.",               time:"19h00", tags:["s"], dur:55},
-      {id:"etirements",  title:"🧘 Étirements — Après sport",               desc:"APRÈS le sport uniquement, jamais avant à froid. Enchaîner : ischio-jambiers debout (30 sec chaque jambe) + quadriceps debout (30 sec chaque jambe) + hanches au sol (30 sec chaque côté) + pectoraux contre un mur (30 sec) + dos en boule au sol (30 sec). Total 5-8 min.", time:"19h45", tags:["s"], dur:8},
+      {id:"sport",      title:"🚴 Sport — 35 min + Pompes + Dips + Tractions + Gainage", desc:"Cardio 35 min + 3×15 pompes + 3×12 dips + 3×5 tractions + 3×50 sec gainage. 3 fois cette semaine.", isSport:true,                                                                                                 time:"19h00", tags:["s"], dur:63},
       {id:"cc_soir",    title:"🫁 Cohérence cardiaque — Soir",           desc:"Inspirer 5 sec par le nez → expirer 5 sec par la bouche. Répéter pendant 5 min.",                                                                                                                                                  time:"19h30", tags:["b"], dur:5},
       {id:"resp_478_av",title:"🫁 Respiration 4-7-8 — Avant séance",     desc:"Inspirer 4 sec → retenir 7 sec → expirer lentement 8 sec. Répéter 4 cycles avant la séance.",                                                                                                                                      time:"20h50", tags:["b"], dur:3},
-      {id:"session",    title:"🌊 Session libre — Toutes techniques",    desc:"Pratique libre. Intégrer naturellement : Stop & Start (monter à 7-8/10 → stopper → 4/10), Squeeze sur le frein (10-15 sec à 8/10), Reverse Kegel au moment critique, respiration inversée (2 sec inspirer → 10 sec expirer). Jambes relâchées.", time:"21h00", tags:["t"], dur:20},
+      {id:"session",    title:"🌊 Session libre — Toutes techniques",    desc:"Pratique libre. Intégrer naturellement : Stop & Start, Squeeze sur le frein, Reverse Kegel au moment critique, respiration inversée. Jambes relâchées.",                                                                           time:"21h00", tags:["t"], dur:20},
       {id:"resp_478",   title:"🫁 Respiration 4-7-8 — Avant sommeil",    desc:"Inspirer 4 sec → retenir 7 sec → expirer lentement 8 sec. Répéter 4 cycles.",                                                                                                                                                      time:"22h15", tags:["b"], dur:3},
       {id:"sommeil",    title:"🌙 Coucher avant 23h",                    desc:"Chambre fraîche (18-20°C), obscurité totale, écrans éteints. Priorité absolue.",                                                                                                                                                    time:"22h30", tags:["v"], dur:0},
     ]
   },
-
   "11-12": {
     phase:"MAÎTRISE", objectif:"Automatisation complète — toutes les techniques devenues des réflexes", duree:"~60 min / jour",
     tasks:[
@@ -370,40 +537,28 @@ const PROGRAM = {
       {id:"eau_13h",    title:"💧 Eau — 13h",                            desc:"Boire 250ml.",                                                                                                                                                                                                                      time:"13h00", tags:["e"], dur:1},
       {id:"cc_midi",    title:"🫁 Cohérence cardiaque — Midi",           desc:"Inspirer 5 sec par le nez → expirer 5 sec par la bouche. Répéter pendant 5 min.",                                                                                                                                                  time:"13h30", tags:["b"], dur:5},
       {id:"eau_16h",    title:"💧 Eau — 16h",                            desc:"Boire 250ml.",                                                                                                                                                                                                                      time:"16h00", tags:["e"], dur:1},
-      {id:"sport",      title:"🚴 Vélo 35 min + Programme haut du corps complet", desc:"Vélo 35 min. Enchaîner : 3×18 pompes + 3×12 dips sur chaise + 3×8 tractions + 3×55 sec gainage ventral + 3×10 superman allongé (dos et fessiers). Respiration abdominale. 3 fois cette semaine.",                        time:"19h00", tags:["s"], dur:60},
-      {id:"etirements",  title:"🧘 Étirements — Après sport",               desc:"APRÈS le sport uniquement, jamais avant à froid. Enchaîner : ischio-jambiers debout (30 sec chaque jambe) + quadriceps debout (30 sec chaque jambe) + hanches au sol (30 sec chaque côté) + pectoraux contre un mur (30 sec) + dos en boule au sol (30 sec). Total 5-8 min.", time:"19h45", tags:["s"], dur:8},
+      {id:"sport",      title:"🚴 Sport — 35 min + Programme haut du corps complet", desc:"Cardio 35 min + 3×18 pompes + 3×12 dips + 3×8 tractions + 3×55 sec gainage + 3×10 superman. 3 fois cette semaine.", isSport:true,                                                                                     time:"19h00", tags:["s"], dur:68},
       {id:"cc_soir",    title:"🫁 Cohérence cardiaque — Soir",           desc:"Inspirer 5 sec par le nez → expirer 5 sec par la bouche. Répéter pendant 5 min.",                                                                                                                                                  time:"19h30", tags:["b"], dur:5},
       {id:"resp_478_av",title:"🫁 Respiration 4-7-8 — Avant séance",     desc:"Inspirer 4 sec → retenir 7 sec → expirer lentement 8 sec. Répéter 4 cycles avant la séance.",                                                                                                                                      time:"20h50", tags:["b"], dur:3},
-      {id:"pratique",   title:"🌊 Pratique naturelle — Techniques en réflexe", desc:"Stop & Start (7-8/10 → stop → 4/10), Squeeze sur le frein (10-15 sec à 8/10), Reverse Kegel au moment critique (pousser vers l'extérieur 5 sec), respiration inversée (inspirer 2 sec → retenir 2 sec → expirer 10 sec). Toutes les techniques sont des réflexes. Jambes relâchées.", time:"21h00", tags:["t"], dur:15},
+      {id:"pratique",   title:"🌊 Pratique naturelle — Techniques en réflexe", desc:"Stop & Start, Squeeze sur le frein, Reverse Kegel au moment critique, respiration inversée. Toutes les techniques sont des réflexes. Jambes relâchées.",                                                                    time:"21h00", tags:["t"], dur:15},
       {id:"resp_478",   title:"🫁 Respiration 4-7-8 — Avant sommeil",    desc:"Inspirer 4 sec → retenir 7 sec → expirer lentement 8 sec. Répéter 4 cycles.",                                                                                                                                                      time:"22h15", tags:["b"], dur:3},
       {id:"sommeil",    title:"🌙 Coucher avant 23h",                    desc:"Chambre fraîche (18-20°C), obscurité totale, écrans éteints. Priorité absolue.",                                                                                                                                                    time:"22h30", tags:["v"], dur:0},
     ]
   },
-
 };
 
-// ═══════════════════════════════════════════════════════════════
-// PROGRAMME MAINTENANCE (semaine 13+) — généré dynamiquement
-// Programme lit : FIXE (identique sem 11-12)
-// Sport : progression infinie toutes les 2 semaines
-// Eau : fixe (1.5L/jour maintenu)
-// ═══════════════════════════════════════════════════════════════
 function getMaintProgram(week) {
-  // Progression toutes les 4 semaines, plafond semaine 45
   const cappedWeek = Math.min(week, 45);
   const extra      = Math.floor((cappedWeek - 13) / 4);
   const atCap      = week >= 45;
-
   const veloMin    = 35 + extra * 5;
   const pompes     = 18 + extra;
   const dips       = 12 + extra;
   const tractions  = 8  + extra;
   const gainage    = 55 + extra * 5;
   const superman   = 10 + extra;
-  const totalSport = veloMin + 30; // +30 pour étirements inclus
-
+  const totalSport = veloMin + 30;
   const capNote = atCap ? " — NIVEAU MAXIMUM ATTEINT, maintien à vie" : "";
-
   return {
     phase:"MAINTENANCE",
     objectif:`Maintien à vie — programme lit fixe, sport en progression (sem. ${week})${capNote}`,
@@ -416,60 +571,97 @@ function getMaintProgram(week) {
       {id:"eau_13h",     title:"💧 Eau — 13h",                              desc:"Boire 250ml.",                                                                                                                                                                                               time:"13h00", tags:["e"], dur:1},
       {id:"cc_midi",     title:"🫁 Cohérence cardiaque — Midi",             desc:"Inspirer 5 sec par le nez → expirer 5 sec par la bouche. Répéter pendant 5 min.",                                                                                                                            time:"13h30", tags:["b"], dur:5},
       {id:"eau_16h",     title:"💧 Eau — 16h",                              desc:"Boire 250ml.",                                                                                                                                                                                               time:"16h00", tags:["e"], dur:1},
-      {id:"sport",       title:`🚴 Vélo ${veloMin} min + Haut du corps`,
-        desc:`Vélo ${veloMin} min. Enchaîner : 3×${pompes} pompes + 3×${dips} dips sur chaise + 3×${tractions} tractions + 3×${gainage} sec gainage ventral + 3×${superman} superman allongé. Respiration abdominale pendant tout l'effort. 3 fois cette semaine.`,
-        time:"19h00", tags:["s"], dur:veloMin + 20},
-      {id:"etirements",  title:"🧘 Étirements — Après sport",               desc:"APRÈS le sport uniquement, jamais avant à froid. Enchaîner : ischio-jambiers debout (30 sec chaque jambe) + quadriceps debout (30 sec chaque jambe) + hanches au sol (30 sec chaque côté) + pectoraux contre un mur (30 sec) + dos en boule au sol (30 sec). Total 5-8 min.",                                                                                                    time:"19h45", tags:["s"], dur:8},
+      {id:"sport",       title:`🚴 Sport — ${veloMin} min + Haut du corps`, desc:`Cardio ${veloMin} min + 3×${pompes} pompes + 3×${dips} dips + 3×${tractions} tractions + 3×${gainage} sec gainage + 3×${superman} superman. 3 fois cette semaine.`, isSport:true,                          time:"19h00", tags:["s"], dur:veloMin + 28},
       {id:"cc_soir",     title:"🫁 Cohérence cardiaque — Soir",             desc:"Inspirer 5 sec par le nez → expirer 5 sec par la bouche. Répéter pendant 5 min.",                                                                                                                            time:"20h00", tags:["b"], dur:5},
       {id:"resp_478_av", title:"🫁 Respiration 4-7-8 — Avant séance",       desc:"Inspirer 4 sec → retenir 7 sec → expirer lentement 8 sec. Répéter 4 cycles avant la séance.",                                                                                                               time:"20h50", tags:["b"], dur:3},
-      {id:"pratique",    title:"🌊 Pratique naturelle — Programme lit fixe", desc:"Stop & Start (7-8/10 → stop → 4/10), Squeeze sur le frein (10-15 sec à 8/10), Reverse Kegel au moment critique (pousser vers l'extérieur 5 sec), respiration inversée (inspirer 2 sec → retenir 2 sec → expirer 10 sec). Toutes les techniques sont des réflexes permanents. Jambes relâchées.",  time:"21h00", tags:["t"], dur:15},
+      {id:"pratique",    title:"🌊 Pratique naturelle — Programme lit fixe", desc:"Stop & Start, Squeeze sur le frein, Reverse Kegel au moment critique, respiration inversée. Toutes les techniques sont des réflexes permanents. Jambes relâchées.",                                        time:"21h00", tags:["t"], dur:15},
       {id:"resp_478",    title:"🫁 Respiration 4-7-8 — Avant sommeil",      desc:"Inspirer 4 sec → retenir 7 sec → expirer lentement 8 sec. Répéter 4 cycles.",                                                                                                                               time:"22h15", tags:["b"], dur:3},
       {id:"sommeil",     title:"🌙 Coucher avant 23h",                      desc:"Chambre fraîche (18-20°C), obscurité totale, écrans éteints. Priorité absolue.",                                                                                                                             time:"22h30", tags:["v"], dur:0},
     ]
   };
 }
 
-
 // ═══════════════════════════════════════════════════════════════
-// HELPERS
-function getMaintProgram(week) {
-  // Sport : progression continue à partir de sem 13
-  // Toutes les 2 semaines on ajoute 5 min vélo et 1 rep aux exercices
-  const extra = Math.floor((week - 13) / 2);
-  const veloMin  = 35 + extra * 5;
-  const pompes   = 18 + extra;
-  const dips     = 12 + extra;
-  const tractions= 8 + extra;
-  const gainage  = 55 + extra * 5;
-  const superman = 10 + extra;
+// SPORT MODAL
+// ═══════════════════════════════════════════════════════════════
+let currentSportTab = 'velo';
+let currentSportPhaseKey = '1-2';
 
-  return {
-    phase:"MAINTENANCE",
-    objectif:`Maintien à vie — Programme lit fixe + sport en progression (sem. ${week})`,
-    duree:`~${60 + extra*5} min / jour`,
-    tasks:[
-      {id:"eau_matin", slot:"matin",  title:"💧 Eau — Réveil",           desc:"Boire 500ml d'eau dès le réveil, avant tout.",                                                                                                                        time:"07h00", tags:["e"], dur:1},
-      {id:"eau_10h",   slot:"bureau", title:"💧 Eau — 10h",               desc:"Boire 250ml. Bouteille sur le bureau visible.",                                                                                                                      time:"10h00", tags:["e"], dur:1},
-      {id:"eau_midi",  slot:"pause",  title:"💧 Eau — 13h",               desc:"Boire 250ml.",                                                                                                                                                       time:"13h00", tags:["e"], dur:1},
-      {id:"eau_16h",   slot:"pause",  title:"💧 Eau — 16h",               desc:"Boire 250ml.",                                                                                                                                                       time:"16h00", tags:["e"], dur:1},
-      {id:"cc_matin",  slot:"bureau", title:"🫁 Cohérence cardiaque — Matin", desc:"Inspirer 5 sec par le nez → expirer 5 sec par la bouche. Répéter pendant 5 min assis à ton bureau.",                                                           time:"10h30", tags:["b"], dur:5},
-      {id:"cc_midi",   slot:"pause",  title:"🫁 Cohérence cardiaque — Midi",  desc:"Inspirer 5 sec par le nez → expirer 5 sec par la bouche. Répéter pendant 5 min.",                                                                             time:"13h30", tags:["b"], dur:5},
-      {id:"cc_soir",   slot:"soir",   title:"🫁 Cohérence cardiaque — Soir",  desc:"Inspirer 5 sec par le nez → expirer 5 sec par la bouche. Répéter pendant 5 min.",                                                                             time:"19h30", tags:["b"], dur:5},
-      {id:"k_maint",   slot:"bureau", title:"💪 Kegel — 2 à 3 fois par semaine", desc:"Kegel lent (5 reps × 15 sec) + Reverse Kegel (10 reps × 5 sec). 10 min. Hygiène musculaire permanente comme se brosser les dents.",                       time:"11h00", tags:["k"], dur:10},
-      {id:"sport",     slot:"soir",   title:`🚴 Vélo ${veloMin} min + Pompes + Dips + Tractions + Gainage + Superman`,
-        desc:`Vélo ${veloMin} min. Enchaîner : 3×${pompes} pompes + 3×${dips} dips sur chaise + 3×${tractions} tractions + 3×${gainage} sec gainage + 3×${superman} superman allongé. Respiration abdominale. 3 fois cette semaine.`,
-        time:"19h00", tags:["s"], dur: veloMin + 25},
-      {id:"pratique",  slot:"nuit",   title:"🌊 Pratique naturelle — Programme lit fixe", desc:"Stop & Start, Squeeze sur le frein (10-15 sec à 8/10), Reverse Kegel au moment critique, respiration inversée (inspirer 2 sec → expirer 10 sec). Toutes les techniques sont des réflexes permanents. Jambes relâchées.", time:"21h00", tags:["t"], dur:15},
-      {id:"resp_478",  slot:"nuit",   title:"🫁 Respiration 4-7-8 — Avant sommeil", desc:"Inspirer 4 sec → retenir 7 sec → expirer lentement 8 sec. Répéter 4 cycles.",                                                                           time:"22h15", tags:["b"], dur:3},
-      {id:"sommeil",   slot:"nuit",   title:"🌙 Coucher avant 23h",       desc:"Chambre fraîche (18-20°C), obscurité totale, écrans éteints. Priorité absolue.",                                                                                    time:"22h30", tags:["v"], dur:0},
-    ]
-  };
+function getSportPhaseData(weekKey, week) {
+  if (weekKey === '13+') return getSportMaintPhase(week);
+  return SPORT_PHASES[weekKey] || SPORT_PHASES['11-12'];
+}
+
+function openSportModal(weekKey, week) {
+  currentSportPhaseKey = weekKey;
+  currentSportTab = 'velo';
+  const data = getSportPhaseData(weekKey, week);
+  document.getElementById('sportModalTitle').textContent = '🏋️ Séance du jour';
+  document.getElementById('sportModalSub').textContent = data.sub;
+  document.getElementById('toggleVelo').classList.add('active');
+  document.getElementById('toggleMaison').classList.remove('active');
+  renderSportExos(data, 'velo', week);
+  document.getElementById('sportOverlay').classList.add('open');
+}
+
+function switchSportTab(tab) {
+  currentSportTab = tab;
+  document.getElementById('toggleVelo').classList.toggle('active', tab === 'velo');
+  document.getElementById('toggleMaison').classList.toggle('active', tab === 'maison');
+  const week = loadWeek();
+  const data = getSportPhaseData(currentSportPhaseKey, week);
+  renderSportExos(data, tab, week);
+}
+
+function renderSportExos(data, tab, week) {
+  const list = document.getElementById('sportExosList');
+  list.innerHTML = '';
+
+  if (tab === 'velo') {
+    const v = data.velo;
+    const card = document.createElement('div');
+    card.className = 'exo-card';
+    card.style.cssText = '--exo-color: var(--accent);';
+    card.querySelector = () => null;
+    card.innerHTML = `
+      <div class="exo-card-head">
+        <div class="exo-card-name">🚴 Vélo / Cardio machine</div>
+        <div class="exo-card-sets" style="background:rgba(79,142,247,0.12);color:#93c5fd;">${v.dur} min</div>
+      </div>
+      <div class="exo-card-desc">${v.desc}</div>
+      <div class="exo-card-bottom">
+        <div class="exo-card-muscles"><span class="muscle-tag">Cardio</span><span class="muscle-tag">Endurance</span></div>
+        <div class="exo-chrono-btn" onclick="openChrono('Cardio vélo', ${v.dur})">⏱ ${v.dur} min</div>
+      </div>`;
+    list.appendChild(card);
+  } else {
+    data.maison.forEach(exo => {
+      const card = document.createElement('div');
+      card.className = 'exo-card';
+      card.innerHTML = `
+        <div class="exo-card-head">
+          <div class="exo-card-name">${exo.nom}</div>
+          <div class="exo-card-sets">${exo.sets}</div>
+        </div>
+        <div class="exo-card-desc">${exo.desc}</div>
+        <div class="exo-card-bottom">
+          <div class="exo-card-muscles">${exo.muscles.map(m=>`<span class="muscle-tag">${m}</span>`).join('')}</div>
+          ${exo.dur > 0 ? `<div class="exo-chrono-btn" onclick="openChrono('${exo.nom.replace(/'/g,"\\'")}', ${exo.dur})">⏱ ${exo.dur} min</div>` : ''}
+        </div>`;
+      list.appendChild(card);
+    });
+  }
+}
+
+function closeSportModal() {
+  document.getElementById('sportOverlay').classList.remove('open');
+}
+function closeSportOut(e) {
+  if (e.target === document.getElementById('sportOverlay')) closeSportModal();
 }
 
 // ═══════════════════════════════════════════════════════════════
 // HELPERS
-
-
 // ═══════════════════════════════════════════════════════════════
 const PHASES_LIST = [null,"1-2","1-2","3-4","3-4","5-6","5-6","7-8","7-8","9-10","9-10","11-12","11-12"];
 const PHASE_LABELS = {"1-2":"Fondation","3-4":"Renforcement","5-6":"Contrôle","7-8":"Intégration","9-10":"Consolidation","11-12":"Maîtrise","13+":"Maintenance"};
@@ -486,13 +678,11 @@ function getKey(w){
   if(w >= 13) return "13+";
   return PHASES_LIST[w];
 }
-
 function getProgram(w){
   if(w >= 13) return getMaintProgram(w);
   const key = getKey(w);
   return PROGRAM[key];
 }
-
 function checkNewDay(){
   const last = localStorage.getItem(TK);
   const now  = today();
@@ -527,11 +717,9 @@ function render(){
   const list = document.getElementById('taskList');
   list.innerHTML = '';
 
-  // Trier toutes les tâches par heure chronologique
   function timeToMin(t){ const [h,m]=(t||'00h00').split('h').map(Number); return h*60+(m||0); }
   const sorted = [...prog.tasks].sort((a,b)=>timeToMin(a.time)-timeToMin(b.time));
 
-  // Grouper par tranches horaires avec label
   const sections = [
     {label:"🌅 Matin — Avant le taff",    from:0,    to:9*60},
     {label:"🏢 Au bureau — Matin",         from:9*60, to:13*60},
@@ -547,7 +735,7 @@ function render(){
     lbl.className = 'sec-lbl';
     lbl.textContent = sec.label;
     list.appendChild(lbl);
-    tasks.forEach(t => list.appendChild(makeTask(t, !!state[t.id])));
+    tasks.forEach(t => list.appendChild(makeTask(t, !!state[t.id], w, key)));
   });
 
   updateProgress(prog, state);
@@ -555,15 +743,20 @@ function render(){
 
 function tagLabel(t){ return{k:"Kegel",b:"Respiration",m:"Mindfulness",t:"Technique",s:"Sport",e:"Hydratation",a:"Alimentation",v:"Sommeil"}[t]||t; }
 
-function makeTask(task, done){
+function makeTask(task, done, week, key){
   const el = document.createElement('div');
   el.className = 'task'+(done?' done':'');
   el.dataset.id = task.id;
   const tags = task.tags.map(t=>`<span class="tag ${t}">${tagLabel(t)}</span>`).join('')
              + (task.dur > 0 ? `<span class="tag d">⏱ ${task.dur} min</span>` : '');
-  const chronoBtn = task.dur > 0
-    ? `<div class="t-chrono-btn" onclick="event.stopPropagation();openChrono('${task.title.replace(/'/g,"\\'")}', ${task.dur})">⏱ Lancer le chrono — ${task.dur} min</div>`
-    : '';
+
+  let extra = '';
+  if (task.isSport) {
+    extra = `<div class="t-sport-btn" onclick="event.stopPropagation();openSportModal('${key}', ${week})">🏋️ Voir les exercices</div>`;
+  } else if (task.dur > 0) {
+    extra = `<div class="t-chrono-btn" onclick="event.stopPropagation();openChrono('${task.title.replace(/'/g,"\\'")}', ${task.dur})">⏱ Lancer le chrono — ${task.dur} min</div>`;
+  }
+
   el.innerHTML = `
     <div class="chk"><span class="chk-ico">✓</span></div>
     <div class="t-body">
@@ -573,7 +766,7 @@ function makeTask(task, done){
       </div>
       <div class="t-desc">${task.desc}</div>
       <div class="t-tags">${tags}</div>
-      ${chronoBtn}
+      ${extra}
     </div>`;
   el.onclick = () => toggle(el, task.id);
   return el;
@@ -676,13 +869,12 @@ function updateHeader(){
 // ═══════════════════════════════════════════════════════════════
 // CHRONO
 // ═══════════════════════════════════════════════════════════════
-const MAX_CHRONO_SEC = 30 * 60; // 30 min max absolu
+const MAX_CHRONO_SEC = 30 * 60;
 let cInterval = null;
-let cTotal    = 0;   // durée totale en secondes
-let cRemain   = 0;   // secondes restantes
+let cTotal    = 0;
+let cRemain   = 0;
 let cRunning  = false;
-
-const CIRCUM = 2 * Math.PI * 74; // circonférence cercle r=74
+const CIRCUM = 2 * Math.PI * 74;
 
 function openChrono(name, durMin) {
   const dur = Math.min(durMin * 60, MAX_CHRONO_SEC);
@@ -690,15 +882,12 @@ function openChrono(name, durMin) {
   cRemain  = dur;
   cRunning = false;
   clearInterval(cInterval);
-
   document.getElementById('cTaskName').textContent = name;
-  document.getElementById('cTaskDur').textContent  = durMin <= 30
-    ? `${durMin} min` : `${durMin} min (limité à 30 min)`;
+  document.getElementById('cTaskDur').textContent  = durMin <= 30 ? `${durMin} min` : `${durMin} min (limité à 30 min)`;
   document.getElementById('cBtnStart').textContent = '▶ Démarrer';
   document.getElementById('cDoneMsg').style.display = 'none';
   document.getElementById('cStatus').textContent   = 'Prêt';
   document.getElementById('cStatus').style.color   = 'var(--muted)';
-
   updateChronoDisplay();
   document.getElementById('chronoOverlay').classList.add('open');
 }
@@ -708,7 +897,6 @@ function closeChronoModal() {
   cRunning = false;
   document.getElementById('chronoOverlay').classList.remove('open');
 }
-
 function closeChronoOut(e) {
   if (e.target === document.getElementById('chronoOverlay')) closeChronoModal();
 }
@@ -736,7 +924,6 @@ function chronoStartStop() {
         document.getElementById('cStatus').style.color      = 'var(--green)';
         document.getElementById('cDoneMsg').style.display   = 'block';
         document.getElementById('chronoArc').style.stroke   = 'var(--green)';
-        // vibration si dispo
         if (navigator.vibrate) navigator.vibrate([300, 100, 300]);
       }
     }, 1000);
@@ -760,15 +947,11 @@ function updateChronoDisplay() {
   const s = cRemain % 60;
   document.getElementById('cTime').textContent =
     `${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')}`;
-
-  // arc SVG
   const ratio   = cTotal > 0 ? cRemain / cTotal : 1;
   const offset  = CIRCUM * (1 - ratio);
   const arc = document.getElementById('chronoArc');
   arc.style.strokeDasharray  = CIRCUM;
   arc.style.strokeDashoffset = offset;
-
-  // couleur selon temps restant
   if (ratio > 0.5)       arc.style.stroke = 'var(--accent)';
   else if (ratio > 0.2)  arc.style.stroke = 'var(--orange, #f97316)';
   else                   arc.style.stroke = '#ef4444';
